@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Crosshair, MousePointer2, Monitor, ArrowRight } from 'lucide-react';
+import { Crosshair, MousePointer2, Monitor, ArrowRight, } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { motion } from 'framer-motion'; // 1. Імпортуємо анімацію
+import { motion } from 'framer-motion'; 
+import { Icon } from '../components/Icon';
 
 export default function Home() {
   const { t } = useLanguage();
 
   return (
-    // 2. Замінюємо div на motion.div і додаємо параметри плавного переходу
     <motion.div 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
@@ -50,16 +50,22 @@ export default function Home() {
             </button>
           </div>
           
-          {/* Логотипи ігор */}
-          <div className="mt-12 flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Counter-Strike_2_logo.svg" className="h-8" alt="CS2"/>
-             <img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Valorant_logo_-_pink_color_version.svg" className="h-8" alt="Valorant"/>
-             <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Dota_2_Logo.svg" className="h-8" alt="Dota 2"/>
+          {/* Секція з іконками ігор через Sprite */}
+          <div className="mt-12 flex justify-center gap-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="flex items-center hover:scale-110 transition-transform">
+              <Icon name="cs2_logo" className="h-8 w-auto text-white" />
+            </div>
+            <div className="flex items-center hover:scale-110 transition-transform">
+              <Icon name="valorant_logo" className="h-8 w-auto text-white" />
+            </div>
+            <div className="flex items-center hover:scale-110 transition-transform">
+              <Icon name="dota_logo" className="h-8 w-auto text-white" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* FEATURES */}
+      {/* FEATURES SECTION */}
       <div className="py-20 bg-slate-950">
         <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800">
@@ -86,48 +92,51 @@ export default function Home() {
           <h2 className="text-3xl font-black uppercase italic mb-10 text-center">{t('home.choose_title')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* CS2 */}
+            {/* CS2 Card */}
             <Link to="/cs2" className="group relative h-64 rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-yellow-400 transition-all">
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-10" />
               <img 
                 src="https://upload.wikimedia.org/wikipedia/en/f/f2/CS2_Cover_Art.jpg" 
+                alt="CS2"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-700"
               />
-              <div className="absolute bottom-6 left-6 z-20">
+              <div className="absolute bottom-6 left-6 z-20 text-left">
                 <h3 className="text-3xl font-black italic">CS2</h3>
-                <p className="text-yellow-400 font-bold flex items-center gap-2">{t('home.btn_more')} <ArrowRight size={16}/></p>
+                <p className="text-yellow-400 font-bold flex items-center gap-2">
+                  {t('home.btn_more')} <ArrowRight size={16}/>
+                </p>
               </div>
             </Link>
 
-            {/* Valorant */}
+            {/* Valorant Card */}
             <div className="group relative h-64 rounded-2xl overflow-hidden border border-slate-800 opacity-50 grayscale hover:grayscale-0 transition-all cursor-not-allowed">
               <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center">
                  <span className="bg-slate-800 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest border border-slate-600">{t('home.coming_soon')}</span>
               </div>
               <img 
                 src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Valorant_logo_-_pink_color_version.svg" 
+                alt="Valorant"
                 className="absolute inset-0 w-full h-full object-cover p-10 bg-slate-900" 
               />
-              <div className="absolute bottom-6 left-6 z-20">
-                <h3 className="text-3xl font-black italic">VALORANT</h3>
+              <div className="absolute bottom-6 left-6 z-20 text-left text-white">
+                <h3 className="text-3xl font-black italic uppercase">VALORANT</h3>
               </div>
             </div>
 
-            {/* Dota 2 */}
+            {/* Dota 2 Card */}
              <div className="group relative h-64 rounded-2xl overflow-hidden border border-slate-800 opacity-50 grayscale hover:grayscale-0 transition-all cursor-not-allowed">
               <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center">
                  <span className="bg-slate-800 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest border border-slate-600">{t('home.coming_soon')}</span>
               </div>
               <img 
                 src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Dota_2_Logo.svg" 
+                alt="Dota 2"
                 className="absolute inset-0 w-full h-full object-cover p-12 bg-slate-900"
               />
-              <div className="absolute bottom-6 left-6 z-20">
-                <h3 className="text-3xl font-black italic">DOTA 2</h3>
+              <div className="absolute bottom-6 left-6 z-20 text-left text-white">
+                <h3 className="text-3xl font-black italic uppercase">DOTA 2</h3>
               </div>
             </div>
-
           </div>
         </div>
       </div>
