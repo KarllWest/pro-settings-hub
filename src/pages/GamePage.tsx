@@ -4,11 +4,9 @@ import { supabase } from '../services/supabase';
 import type { Player, Team } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
 import { Search } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion'; // Імпорт анімації
 
 export default function GamePage() {
-  const { t } = useLanguage();
   const [players, setPlayers] = useState<Player[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);

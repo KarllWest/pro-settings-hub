@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { CheckCircle, XCircle, X } from 'lucide-react';
 
 // Типи повідомлення
