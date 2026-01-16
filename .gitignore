@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Secrets (ВАЖЛИВО: додаємо це, щоб ключі не полетіли в інтернет)
+.env
+.env.production
+.env.development
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
