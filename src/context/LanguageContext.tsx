@@ -1,27 +1,40 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { translations, type Language } from '../translations.ts';
+import { translations } from '../translations';
+
+type Language = 'en' | 'uk' | 'ru';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (path: string) => string; // Функція перекладу
+  t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('uk'); // Українська за замовчуванням
+  const [language, setLanguage] = useState<Language>('en');
 
-  // Функція t('home.title') -> повертає текст
-  const t = (path: string) => {
-    const keys = path.split('.');
-    let current: any = translations[language];
-    
-    for (const key of keys) {
-      if (current[key] === undefined) return path; // Якщо перекладу нема, повертаємо ключ
-      current = current[key];
+  // Функція для пошуку вкладених ключів (наприклад, "home.title_start")
+  const getNestedTranslation = (lang: Language, key: string) => {
+    const keys = key.split('.');
+    let current: any = translations[lang];
+
+    for (const k of keys) {
+      if (current === undefined) return undefined;
+      current = current[k];
     }
     return current;
+  };
+
+  const t = (key: string) => {
+    // 1. Шукаємо поточною мовою
+    const text = getNestedTranslation(language, key);
+    
+    // 2. Якщо немає — шукаємо англійською (fallback)
+    const fallback = getNestedTranslation('en', key);
+
+    // 3. Якщо все ще немає — повертаємо сам ключ
+    return text || fallback || key;
   };
 
   return (
@@ -31,7 +44,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Хук, щоб використовувати мову в будь-якому компоненті
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
