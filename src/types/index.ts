@@ -6,16 +6,14 @@ export interface Team {
 
 export interface Player {
   id: number;
-  // 👇 НОВЕ ПОЛЕ
-  game: 'cs2' | 'valorant' | 'dota2'; 
-  
+  game: 'cs2' | 'valorant' | 'dota2'; // Важливо!
   nickname: string;
   real_name: string;
   avatar_url: string;
   team_id: number;
   teams?: Team;
   
-  // 👇 НОВІ ПОЛЯ ДЛЯ СОЦМЕРЕЖ
+  // Соцмережі
   hltv_url?: string;
   faceit_url?: string;
   instagram_url?: string;
@@ -39,12 +37,11 @@ export interface Setup {
   crosshair_code: string;
   launch_options: string;
   
-  // JSONB fields
   graphics_settings: any;
   viewmodel_settings: any;
   keybinds: any;
-  custom_binds: any[];     // <-- Масив об'єктів
-  config_commands: any[];  // <-- Масив об'єктів
+  custom_binds: any[];
+  config_commands: any[];
   gear: any;
   pc_specs: any;
   monitor_settings: any;

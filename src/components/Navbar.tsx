@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
+import { Keyboard } from 'lucide-react'; // 👈 Додав імпорт іконки
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguage();
@@ -12,9 +13,14 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         
-        {/* LOGO */}
-        <Link to="/" className="text-2xl font-black italic uppercase tracking-tighter text-white">
-          ProSettings<span className="text-yellow-400">Hub</span>
+        {/* LOGO: KEYBINDY */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="bg-yellow-400 text-slate-900 p-2 rounded-xl -rotate-6 group-hover:rotate-0 transition-transform duration-300 shadow-lg shadow-yellow-400/20">
+            <Keyboard size={28} strokeWidth={2.5} />
+          </div>
+          <span className="text-2xl font-black italic uppercase tracking-tighter text-white">
+            KEY<span className="text-yellow-400">BINDY</span>
+          </span>
         </Link>
 
         {/* LINKS */}
@@ -22,8 +28,13 @@ export default function Navbar() {
           <NavLink to="/cs2" active={isActive('/cs2')}>CS2</NavLink>
           <NavLink to="/valorant" active={isActive('/valorant')}>VALORANT</NavLink>
           <NavLink to="/dota2" active={isActive('/dota2')}>DOTA 2</NavLink>
+          
+          {/* 👇 НОВА КНОПКА ГАЙД 👇 */}
+          <NavLink to="/guide" active={isActive('/guide')}>
+             <span className="text-yellow-400">GUIDE</span>
+          </NavLink>
         </div>
-
+        
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-6">
           

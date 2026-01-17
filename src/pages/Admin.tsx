@@ -23,7 +23,6 @@ export default function Admin() {
   const initialFormState = {
     game: 'cs2', 
     nickname: '', real_name: '', team_id: '', avatar_url: '', 
-    // 👇 Соціальні мережі
     hltv_url: '', faceit_url: '', instagram_url: '',
     dotabuff_url: '', liquipedia_url: '',
 
@@ -46,7 +45,6 @@ export default function Admin() {
     },
     viewmodel_settings: { fov: 68, offset_x: 2.5, offset_y: 0, offset_z: -1.5, presetpos: 3 },
     
-    // Links for gear
     gear: {
       monitor: 'ZOWIE XL2566K', monitor_link: '',
       mouse: 'Logitech G Pro X Superlight', mouse_link: '',
@@ -73,7 +71,6 @@ export default function Admin() {
 
   const [formData, setFormData] = useState(initialFormState);
 
-  // --- ПАРСИНГ ---
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -140,8 +137,7 @@ export default function Admin() {
               if (actionToBindKey[action]) {
                 newBinds[actionToBindKey[action]] = key;
               } else {
-                const ignored = ['+forward', '+back', '+moveleft', '+moveright', '+attack', '+attack2', 'buymenu', 'messagemode', 'messagemode2', 'radio', 'radio1', 'radio2', 'radio3', 'drop', 'teammenu', '+use', '+lookatweapon', '+showscores', '+spray_menu', 'lastinv'];
-                if (!ignored.includes(action) && !newCustomBinds.find(b => b.key === key)) {
+                if (!newCustomBinds.find(b => b.key === key)) {
                    newCustomBinds.push({ name: action, key: key });
                 }
               }
@@ -164,7 +160,6 @@ export default function Admin() {
     showToast(`Config imported!`, "success");
   };
 
-  // --- ЗАВАНТАЖЕННЯ ДАНИХ ТА AUTH ---
   const fetchData = async () => {
     const { data: teamsData } = await supabase.from('teams').select('*');
     if (teamsData) setTeams(teamsData);
@@ -181,7 +176,6 @@ export default function Admin() {
     fetchData();
   }, [navigate]);
 
-  // --- HANDLERS ---
   const handleChange = (e: any) => setFormData({ ...formData, [e.target.name]: e.target.value });
   
   const handleNestedChange = (section: keyof typeof initialFormState, e: any) => {
@@ -218,7 +212,6 @@ export default function Admin() {
   const addConfigCommand = () => setFormData({ ...formData, config_commands: [...formData.config_commands, { command: '', value: '' }] });
   const removeConfigCommand = (index: number) => setFormData({ ...formData, config_commands: formData.config_commands.filter((_, i) => i !== index) });
 
-  // --- SUBMIT ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -268,7 +261,6 @@ export default function Admin() {
       avatar_url: player.avatar_url || '', 
       hltv_url: player.hltv_url || '', faceit_url: player.faceit_url || '', instagram_url: player.instagram_url || '',
       dotabuff_url: player.dotabuff_url || '', liquipedia_url: player.liquipedia_url || '',
-      
       mouse: setup.mouse || '', dpi: setup.dpi || 400, sensitivity: setup.sensitivity || 2.0, zoom_sensitivity: setup.zoom_sensitivity || 1.0,
       resolution: setup.resolution || '', aspect_ratio: setup.aspect_ratio || '4:3', scaling_mode: setup.scaling_mode || 'Stretched',
       hertz: setup.hertz || '360Hz', crosshair_code: setup.crosshair_code || '', launch_options: setup.launch_options || '-novid -high',
@@ -307,7 +299,7 @@ export default function Admin() {
     </div>
   );
 
-  // 👇 ФІЛЬТРАЦІЯ: Показувати тільки гравців обраної гри
+  // 👇 ФІЛЬТРАЦІЯ
   const filteredPlayers = players.filter(p => (p.game || 'cs2') === formData.game);
 
   const tabs = [
@@ -388,6 +380,7 @@ export default function Admin() {
               </motion.div>
             )}
 
+            {/* Gear Tab */}
             {activeTab === 'gear' && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 <div>
@@ -418,6 +411,7 @@ export default function Admin() {
               </motion.div>
             )}
 
+            {/* Video Tab */}
             {activeTab === 'video' && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -471,6 +465,7 @@ export default function Admin() {
               </motion.div>
             )}
 
+            {/* Binds Tab */}
             {activeTab === 'binds' && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                  <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-4"><Keyboard size={20} className="text-purple-500"/> Keybinds</h3>
@@ -497,6 +492,7 @@ export default function Admin() {
               </motion.div>
             )}
 
+            {/* Extra Tab */}
             {activeTab === 'extra' && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                  <div className="flex justify-between items-center mb-4">
@@ -533,7 +529,6 @@ export default function Admin() {
         </div>
 
         <div className="grid gap-4">
-           {/* 👇 ТУТ ТЕПЕР filteredPlayers */}
            {filteredPlayers.length > 0 ? (
              filteredPlayers.map(player => (
                <div key={player.id} className="bg-slate-800 p-4 rounded-xl flex items-center justify-between border border-slate-700 group hover:border-slate-500 transition">
