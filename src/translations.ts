@@ -1,12 +1,15 @@
 export const translations = {
   en: {
-    // --- NAV & HOME ---
+    // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
+      guide: "Installation Guide",
+      login: "Admin Access"
     },
+    // --- HOME PAGE ---
     home: {
       badge: "The Ultimate Database",
       title_start: "SETUP LIKE A",
@@ -16,11 +19,6 @@ export const translations = {
       btn_more: "Learn More",
       choose_title: "CHOOSE DISCIPLINE",
       coming_soon: "COMING SOON",
-      features: {
-        dpi: { title: "DPI & Sensitivity", desc: "Exact mouse sensitivity and zoom multiplier data." },
-        crosshair: { title: "Crosshair Codes", desc: "Copy crosshair codes directly into the game in one click." },
-        video: { title: "Video Settings", desc: "Resolution and graphics settings for max FPS." }
-      },
       stats: {
         profiles: "Pro Profiles",
         teams: "Top Teams",
@@ -28,219 +26,162 @@ export const translations = {
         free: "Free Access"
       }
     },
-
-    // --- GAME & PLAYER PAGES ---
-    search_placeholder: "Search player (e.g. s1mple)...",
-    players: "Players",
-    teams: "Teams",
-    configs: "Configs",
-    loading: "LOADING PRO DATA...",
-    no_players: "No players found",
-    
-    all_teams: "All Teams",
-    download_cfg: "Download CFG",
-    view_profile: "View Profile",
-    
-    // Sections
-    mouse_settings: "Mouse Settings",
-    video_settings: "Video Settings",
-    setup_gear: "Setup & Gear",
-    pc_specs: "PC Specs",
-    monitor_settings: "Monitor Settings",
-    hud_radar: "HUD & Radar",
-    keybinds: "Keybinds",
-    graphics: "Graphics Settings",
-    launch_options: "Launch Options",
+    // --- COMMON STRINGS ---
+    common: {
+      back_to: "Back to",
+      copied: "Copied to clipboard!",
+      loading: "SYSTEM LOADING...",
+      search_placeholder: "Search player or team...",
+      no_players: "No players found",
+      all_teams: "All Teams",
+      download_cfg: "Download CFG",
+      view_profile: "View Profile",
+      teammates: "Active Teammates",
+      guide_label: "Optimization Guide"
+    },
+    // --- SECTIONS & STATS ---
+    mouse_settings: "Mouse Precision",
+    video_settings: "Video & Display",
+    setup_gear: "Hardware & Gear",
+    pc_specs: "PC Components",
+    keybinds: "Keybinds & Actions",
     crosshair: "Crosshair Code",
-    teammates: "Teammates",
-    
-    // Stats
+    hz: "Hz",
+    res: "Resolution",
+    edpi: "eDPI",
     dpi: "DPI",
     sens: "Sens",
-    zoom: "Zoom",
-    edpi: "eDPI",
-    hz: "Hz",
-    res: "Res",
-    
-    // Gear
+    // --- GEAR ---
     monitor: "Monitor",
     mouse: "Mouse",
     keyboard: "Keyboard",
     headset: "Headset",
     mousepad: "Mousepad",
-    earphones: "Earphones",
-    chair: "Chair",
-    
-    // PC
     cpu: "Processor",
-    gpu: "Graphics Card",
-    motherboard: "Motherboard",
-    cooling: "Cooling",
-    
-    // Trending
-    trending_gear: "Trending Gear",
-    most_used_mouse: "Most Used Mouse",
-    most_used_monitor: "Most Used Monitor",
-    most_used_gpu: "Most Used GPU"
+    gpu: "Graphics Card"
   },
 
   uk: {
-    // --- NAV & HOME ---
+    // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
+      guide: "Інструкція",
+      login: "Вхід"
     },
+    // --- HOME PAGE ---
     home: {
       badge: "Найкраща База Даних",
       title_start: "НАЛАШТУЙСЯ ЯК",
       title_end: "ПРО",
       subtitle: "Досить вгадувати. Почни домінувати. Дізнайся налаштування, девайси та конфіги найкращих гравців світу.",
       btn_find: "ЗНАЙТИ КОНФІГ",
-      btn_more: "Дізнатися більше",
+      btn_more: "Детальніше",
       choose_title: "ОБЕРИ ДИСЦИПЛІНУ",
       coming_soon: "СКОРО",
-      features: {
-        dpi: { title: "DPI та Сенса", desc: "Точні дані про чутливість мишки та множники зуму." },
-        crosshair: { title: "Коди Прицілів", desc: "Копіюй коди прицілів в один клік прямо в гру." },
-        video: { title: "Налаштування Відео", desc: "Роздільна здатність та графіка для максимального FPS." }
-      },
       stats: {
         profiles: "Про-Профілів",
         teams: "Топ Команд",
         updates: "Щоденні Оновлення",
-        free: "Безкоштовний Доступ"
+        free: "Безкоштовно"
       }
     },
-
-    // --- GAME & PLAYER PAGES ---
-    search_placeholder: "Пошук гравця (напр. s1mple)...",
-    players: "Гравці",
-    teams: "Команди",
-    configs: "Конфіги",
-    loading: "ЗАВАНТАЖЕННЯ ДАНИХ...",
-    no_players: "Гравців не знайдено",
-    
-    all_teams: "Всі Команди",
-    download_cfg: "Завантажити CFG",
-    view_profile: "Профіль",
-    
+    // --- COMMON STRINGS ---
+    common: {
+      back_to: "Назад до",
+      copied: "Скопійовано!",
+      loading: "ЗАВАНТАЖЕННЯ...",
+      search_placeholder: "Пошук гравця або команди...",
+      no_players: "Гравців не знайдено",
+      all_teams: "Всі Команди",
+      download_cfg: "Завантажити CFG",
+      view_profile: "Профіль",
+      teammates: "Тіммейти",
+      guide_label: "Гайд з Оптимізації"
+    },
+    // --- SECTIONS & STATS ---
     mouse_settings: "Налаштування Миші",
-    video_settings: "Налаштування Відео",
-    setup_gear: "Девайси",
-    pc_specs: "Комп'ютер",
-    monitor_settings: "Налаштування Монітора",
-    hud_radar: "Інтерфейс та Радар",
-    keybinds: "Клавіші (Бінди)",
-    graphics: "Налаштування Графіки",
-    launch_options: "Параметри Запуску",
+    video_settings: "Відео та Екран",
+    setup_gear: "Периферія та Девайси",
+    pc_specs: "Характеристики ПК",
+    keybinds: "Клавіші та Бінди",
     crosshair: "Код Прицілу",
-    teammates: "Тіммейти",
-    
+    hz: "Гц",
+    res: "Роздільна здатність",
+    edpi: "eDPI",
     dpi: "DPI",
     sens: "Сенса",
-    zoom: "Зум",
-    edpi: "eDPI",
-    hz: "Гц",
-    res: "Розширення",
-    
+    // --- GEAR ---
     monitor: "Монітор",
     mouse: "Мишка",
     keyboard: "Клавіатура",
     headset: "Навушники",
     mousepad: "Килимок",
-    earphones: "Вушні монітори",
-    chair: "Крісло",
-    
     cpu: "Процесор",
-    gpu: "Відеокарта",
-    motherboard: "Материнська плата",
-    cooling: "Охолодження",
-
-    trending_gear: "Популярні Девайси",
-    most_used_mouse: "Топ Мишка",
-    most_used_monitor: "Топ Монітор",
-    most_used_gpu: "Топ Відеокарта"
+    gpu: "Відеокарта"
   },
 
   ru: {
-    // --- NAV & HOME ---
+    // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
+      guide: "Инструкция",
+      login: "Вход"
     },
+    // --- HOME PAGE ---
     home: {
       badge: "Лучшая База Данных",
       title_start: "НАСТРОЙСЯ КАК",
       title_end: "ПРО",
       subtitle: "Хватит гадать. Начни доминировать. Узнай настройки, девайсы и конфиги лучших игроков мира.",
       btn_find: "НАЙТИ КОНФИГ",
-      btn_more: "Узнать больше",
+      btn_more: "Подробнее",
       choose_title: "ВЫБЕРИ ДИСЦИПЛИНУ",
       coming_soon: "СКОРО",
-      features: {
-        dpi: { title: "DPI и Сенса", desc: "Точные данные о чувствительности мыши и зуме." },
-        crosshair: { title: "Коды Прицелов", desc: "Копируй коды прицелов в один клик прямо в игру." },
-        video: { title: "Настройки Видео", desc: "Разрешение и графика для максимального FPS." }
-      },
       stats: {
         profiles: "Про-Профилей",
         teams: "Топ Команд",
         updates: "Ежедневные Обновления",
-        free: "Бесплатный Доступ"
+        free: "Бесплатно"
       }
     },
-
-    // --- GAME & PLAYER PAGES ---
-    search_placeholder: "Поиск игрока (напр. s1mple)...",
-    players: "Игроки",
-    teams: "Команды",
-    configs: "Конфиги",
-    loading: "ЗАГРУЗКА ДАННЫХ...",
-    no_players: "Игроки не найдены",
-    
-    all_teams: "Все Команды",
-    download_cfg: "Скачать CFG",
-    view_profile: "Профиль",
-    
+    // --- COMMON STRINGS ---
+    common: {
+      back_to: "Назад к",
+      copied: "Скопировано!",
+      loading: "ЗАГРУЗКА...",
+      search_placeholder: "Поиск игрока или команды...",
+      no_players: "Игроки не найдены",
+      all_teams: "Все Команды",
+      download_cfg: "Скачать CFG",
+      view_profile: "Профиль",
+      teammates: "Тиммейты",
+      guide_label: "Гайд по Оптимизации"
+    },
+    // --- SECTIONS & STATS ---
     mouse_settings: "Настройки Мыши",
-    video_settings: "Настройки Видео",
-    setup_gear: "Девайсы",
-    pc_specs: "Компьютер",
-    monitor_settings: "Настройки Монитора",
-    hud_radar: "Интерфейс и Радар",
-    keybinds: "Бинд клавиш",
-    graphics: "Настройки Графики",
-    launch_options: "Параметры Запуска",
+    video_settings: "Видео и Экран",
+    setup_gear: "Периферия и Девайсы",
+    pc_specs: "Характеристики ПК",
+    keybinds: "Клавиши и Бинды",
     crosshair: "Код Прицела",
-    teammates: "Тиммейты",
-    
-    dpi: "DPI",
-    sens: "Сенса",
-    zoom: "Зум",
-    edpi: "eDPI",
     hz: "Гц",
     res: "Разрешение",
-    
+    edpi: "eDPI",
+    dpi: "DPI",
+    sens: "Сенса",
+    // --- GEAR ---
     monitor: "Монитор",
     mouse: "Мышка",
     keyboard: "Клавиатура",
     headset: "Наушники",
     mousepad: "Коврик",
-    earphones: "Внутриканальные",
-    chair: "Кресло",
-    
     cpu: "Процессор",
-    gpu: "Видеокарта",
-    motherboard: "Материнская плата",
-    cooling: "Охлаждение",
-
-    trending_gear: "Популярные Девайсы",
-    most_used_mouse: "Топ Мышка",
-    most_used_monitor: "Топ Монитор",
-    most_used_gpu: "Топ Видеокарта"
+    gpu: "Видеокарта"
   }
 };

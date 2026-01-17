@@ -1,22 +1,44 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, TrendingUp } from 'lucide-react';
+import { Shield, TrendingUp, Users, Zap, Globe, Award } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../services/supabase';
+import type { Team } from '../types';
 
 export default function Home() {
   const { t } = useLanguage();
+  const [dbTeams, setDbTeams] = useState<Team[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Function to render sprite icons
-  const SpriteIcon = ({ id, className }: { id: string; className?: string }) => (
-    <svg className={className}>
-      <use href={`#${id}`} />
-    </svg>
-  );
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const { data } = await supabase
+          .from('teams')
+          .select('id, name')
+          .limit(12);
+        if (data) setDbTeams(data as Team[]);
+      } catch (err) {
+        console.error("Error fetching teams:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTeams();
+  }, []);
+
+  // Статичні дані на випадок порожньої бази
+  const fallbackTeams = [
+    { id: 1, name: "NAVI" }, { id: 2, name: "Spirit" }, { id: 3, name: "G2" },
+    { id: 4, name: "FaZe" }, { id: 5, name: "Vitality" }, { id: 6, name: "Liquid" }
+  ];
+
+  const displayTeams = dbTeams.length > 0 ? dbTeams : fallbackTeams;
 
   return (
-    <div className="relative overflow-hidden min-h-screen">
-      
-      {/* SVG SPRITE */}
+    <div className="relative min-h-screen">
+      {/* SVG SPRITE - Всі іконки проекту в одному місці */}
       <svg xmlns="http://www.w3.org/2000/svg" style={{ display: 'none' }}>
         <symbol id="icon-faceit" viewBox="0 0 24 24">
           <path fill="currentColor" d="M23.999 2.705a.167.167 0 0 0-.312-.1 1141 1141 0 0 0-6.053 9.375H.218c-.221 0-.301.282-.11.352 7.227 2.73 17.667 6.836 23.5 9.134.15.06.39-.08.39-.18z"/>
@@ -31,152 +53,173 @@ export default function Home() {
           <path fill="currentColor" d="M23.792 2.152a.252.252 0 0 0-.098.083c-3.384 4.23-6.769 8.46-10.15 12.69-.107.093-.025.288.119.265 2.439.003 4.877 0 7.316.001a.66.66 0 0 0 .552-.25c.774-.967 1.55-1.934 2.324-2.903a.72.72 0 0 0 .144-.49c-.002-3.077 0-6.153-.003-9.23.016-.11-.1-.206-.204-.167zM.077 2.166c-.077.038-.074.132-.076.205.002 3.074.001 6.15.001 9.225a.679.679 0 0 0 .158.463l7.64 9.55c.12.152.308.25.505.247 2.455 0 4.91.003 7.365 0 .142.02.222-.174.116-.265C10.661 15.176 5.526 8.766.4 2.35c-.08-.094-.174-.272-.322-.184z"/>
         </symbol>
         <symbol id="icon-hltv" viewBox="0 0 24 24">
-          <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
             <path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
             <path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
             <path d="M4 20h14" />
           </g>
         </symbol>
-        <symbol id="icon-instagram" viewBox="0 0 24 24">
-          <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-          </g>
-        </symbol>
-        <symbol id="icon-dotabuff" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M3 3h18v18H3V3zm14.5 13c0-3.59-2.91-6.5-6.5-6.5S4.5 12.41 4.5 16c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5zm-6.5 4.5c-2.49 0-4.5-2.01-4.5-4.5s2.01-4.5 4.5-4.5 4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>
-          <path fill="currentColor" d="M19 5h-4V3h4v2zm0 4h-2V7h2v2zm0 4h-4v-2h4v2zm0 4h-2v-2h2v2z"/>
-        </symbol>
-        <symbol id="icon-liquipedia" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M19.5 4.5h-15v15h15v-15zM7.5 16.5l-1.5-1.5 4.5-4.5-4.5-4.5 1.5-1.5 6 6-6 6z"/>
-        </symbol>
       </svg>
       
-      {/* Background Glow Effects */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-yellow-400/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+      {/* Background Atmosphere */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[600px] bg-yellow-400/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
       {/* --- HERO SECTION --- */}
-      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12 text-center">
+      <section className="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center">
         <motion.div 
-          initial={{ opacity: 0, y: 30 }} 
+          initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
         >
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 text-xs font-bold tracking-widest uppercase mb-8 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/60 border border-white/5 text-yellow-400 text-[10px] font-black tracking-[0.2em] uppercase mb-8 backdrop-blur-md">
             <Shield size={14} /> {t('home.badge')}
           </div>
 
-          {/* Title */}
-          <h1 className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-6 leading-[0.9]">
+          {/* Main Title */}
+          <h1 className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-6 leading-none text-white">
             {t('home.title_start')} <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-600 drop-shadow-lg">
+            <span className="text-gradient">
               {t('home.title_end')}
             </span>
           </h1>
           
-          <p className="text-slate-400 text-lg md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+          <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-16 font-medium leading-relaxed">
             {t('home.subtitle')}
           </p>
 
-          {/* Game Cards Grid */}
-          <div className="flex flex-wrap justify-center gap-6 mb-20">
+          {/* Game Selection Grid */}
+          <div className="flex flex-wrap justify-center gap-6">
             <GameCard 
               to="/cs2" title="CS2" 
-              icon={<SpriteIcon id="cs2_logo" className="w-12 h-12 text-white fill-current" />} 
-              gradient="from-yellow-400/20 to-orange-500/20" border="hover:border-yellow-400/50" glow="group-hover:shadow-yellow-400/20"
+              icon={<SpriteIcon id="cs2_logo" className="w-10 h-10 fill-current" />} 
+              gradient="from-yellow-400/20 to-orange-500/10" border="hover:border-yellow-400/40"
             />
             <GameCard 
               to="/dota2" title="DOTA 2" 
-              icon={<SpriteIcon id="dota_logo" className="w-12 h-12 text-white fill-current" />} 
-              gradient="from-red-500/20 to-rose-600/20" border="hover:border-red-500/50" glow="group-hover:shadow-red-500/20"
+              icon={<SpriteIcon id="dota_logo" className="w-10 h-10 fill-current" />} 
+              gradient="from-red-500/20 to-rose-600/10" border="hover:border-red-500/40"
             />
             <GameCard 
               to="/valorant" title="VALORANT" 
-              icon={<SpriteIcon id="valorant_logo" className="w-12 h-12 text-white fill-current" />} 
-              gradient="from-pink-500/20 to-purple-600/20" border="hover:border-pink-500/50" glow="group-hover:shadow-pink-500/20"
+              icon={<SpriteIcon id="valorant_logo" className="w-10 h-10 fill-current" />} 
+              gradient="from-pink-500/20 to-purple-600/10" border="hover:border-pink-500/40"
             />
           </div>
         </motion.div>
-      </div>
+      </section>
 
       {/* --- STATS BAR --- */}
-      <div className="border-y border-white/5 bg-slate-900/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <StatItem number="1,200+" label={t('home.stats.profiles')} />
-          <StatItem number="50+" label={t('home.stats.teams')} />
-          <StatItem number="Daily" label={t('home.stats.updates')} />
-          <StatItem number="100%" label={t('home.stats.free')} />
+      <div className="border-y border-white/5 bg-slate-900/20 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <StatItem icon={<Users size={20}/>} number="1,200+" label={t('home.stats.profiles')} />
+          <StatItem icon={<Globe size={20}/>} number="50+" label={t('home.stats.teams')} />
+          <StatItem icon={<Zap size={20}/>} number="Daily" label={t('home.stats.updates')} />
+          <StatItem icon={<Award size={20}/>} number="100%" label={t('home.stats.free')} />
         </div>
       </div>
 
-      {/* --- INFINITE MARQUEE --- */}
-      <div className="py-12 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-slate-950 z-10 pointer-events-none" />
-        <div className="flex gap-12 animate-scroll whitespace-nowrap opacity-50">
-          {[...teams, ...teams].map((team, i) => (
-             <span key={i} className="text-4xl font-black italic uppercase text-white/20 px-8">
-               {team}
-             </span>
+      {/* --- TEAM TICKER (SCROLLING) --- */}
+      <div className="py-16 overflow-hidden relative group">
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
+        
+        <div className="flex gap-12 animate-scroll whitespace-nowrap opacity-20 group-hover:opacity-40 transition-opacity duration-700">
+          {[...displayTeams, ...displayTeams].map((team, i) => (
+             <Link 
+               key={`${team.id}-${i}`} 
+               to={`/team/${team.id}`}
+               className="text-5xl font-black italic uppercase text-white px-8 hover:text-yellow-400 transition-colors"
+             >
+               {team.name}
+             </Link>
           ))}
         </div>
       </div>
 
-       {/* --- TRENDING --- */}
-       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex items-center gap-2 mb-8">
-          <TrendingUp className="text-yellow-400" />
-          <h2 className="text-2xl font-bold uppercase tracking-widest text-white">Trending Now</h2>
+      {/* --- TRENDING SECTION --- */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="flex items-center justify-between mb-12">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-yellow-400/10 rounded-lg text-yellow-400">
+              <TrendingUp size={20} />
+            </div>
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">
+              Trending <span className="text-slate-500">Talents</span>
+            </h2>
+          </div>
+          <div className="h-px flex-1 bg-white/5 mx-8 hidden md:block" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <TrendingCard name="s1mple" team="Falcons" game="CS2" image="https://img-cdn.hltv.org/playerbodyshot/pJnWl_CzQDRYokGrTt9WU0.png?ixlib=java-2.1.0&w=400&s=69eedd912a576b21ce033eed7ae4ada4" />
-           <TrendingCard name="Yatoro" team="Spirit" game="DOTA 2" image="https://liquipedia.net/commons/images/thumb/8/87/Yatoro_at_The_International_2023.jpg/600px-Yatoro_at_The_International_2023.jpg" />
-           <TrendingCard name="Donk" team="Spirit" game="CS2" image="https://img-cdn.hltv.org/playerbodyshot/sEwjjWjn36V9aqH6i07aFx.png?ixlib=java-2.1.0&w=400&s=14a4ef10ad0fcd029d9b8872437a697e" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+           <TrendingCard 
+             name="s1mple" team="Falcons" game="CS2" 
+             image="https://img-cdn.hltv.org/playerbodyshot/pJnWl_CzQDRYokGrTt9WU0.png?ixlib=java-2.1.0&w=400&s=69eedd912a576b21ce033eed7ae4ada4" 
+           />
+           <TrendingCard 
+             name="Yatoro" team="Spirit" game="DOTA 2" 
+             image="https://img-cdn.hltv.org/playerbodyshot/pJnWl_CzQDRYokGrTt9WU0.png?ixlib=java-2.1.0&w=400&s=69eedd912a576b21ce033eed7ae4ada4" 
+           />
+           <TrendingCard 
+             name="Donk" team="Spirit" game="CS2" 
+             image="https://img-cdn.hltv.org/playerbodyshot/sEwjjWjn36V9aqH6i07aFx.png?ixlib=java-2.1.0&w=400&s=14a4ef10ad0fcd029d9b8872437a697e" 
+           />
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-// --- COMPONENTS ---
+// --- SUB-COMPONENTS ---
 
-const teams = ["NAVI", "SPIRIT", "VITALITY", "G2", "FAZE", "LIQUID", "CLOUD9", "HEROIC", "FALCONS"];
+const SpriteIcon = ({ id, className }: { id: string; className?: string }) => (
+  <svg className={className}><use href={`#${id}`} /></svg>
+);
 
-const GameCard = ({ to, title, icon, gradient, border, glow }: any) => (
+const GameCard = ({ to, title, icon, gradient, border }: any) => (
   <Link 
     to={to} 
-    className={`group relative w-full md:w-64 h-40 rounded-3xl overflow-hidden border border-white/5 bg-slate-900/40 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${border} ${glow}`}
+    className={`group glass-panel relative w-full md:w-72 h-44 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-yellow-400/5 ${border}`}
   >
-    <div className={`absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradient} rounded-full blur-[40px] transition-all duration-500 group-hover:scale-150`} />
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
-      <div className="p-4 bg-slate-800/50 rounded-2xl border border-white/5 text-slate-300 group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-lg">
+    <div className={`absolute -bottom-12 -right-12 w-40 h-40 bg-gradient-to-br ${gradient} rounded-full blur-[50px] transition-transform duration-700 group-hover:scale-150`} />
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 z-10">
+      <div className="p-4 bg-slate-800/40 rounded-2xl border border-white/5 text-slate-400 group-hover:text-white group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
         {icon}
       </div>
-      <span className="font-black italic uppercase tracking-widest text-xl text-white group-hover:tracking-[0.2em] transition-all duration-300">
+      <span className="font-black italic uppercase tracking-widest text-lg text-white group-hover:tracking-[0.25em] transition-all duration-500">
         {title}
       </span>
     </div>
   </Link>
 );
 
-const StatItem = ({ number, label }: any) => (
-  <div>
-    <div className="text-3xl font-black text-white mb-1">{number}</div>
-    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{label}</div>
+const StatItem = ({ icon, number, label }: any) => (
+  <div className="flex flex-col items-center">
+    <div className="text-slate-500 mb-2">{icon}</div>
+    <div className="text-4xl font-black italic tracking-tighter text-white mb-1">{number}</div>
+    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{label}</div>
   </div>
 );
 
 const TrendingCard = ({ name, team, game, image }: any) => (
-  <div className="relative group h-64 bg-slate-800/50 rounded-2xl overflow-hidden border border-white/5 hover:border-yellow-400/50 transition-all duration-300 cursor-pointer">
-     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
-     <img src={image} className="w-full h-full object-cover object-top group-hover:scale-110 transition duration-700 opacity-80 group-hover:opacity-100" />
-     <div className="absolute bottom-4 left-4 z-20">
-        <span className="text-xs font-bold bg-yellow-400 text-black px-2 py-0.5 rounded mb-2 inline-block">{game}</span>
-        <h3 className="text-2xl font-black italic uppercase text-white leading-none">{name}</h3>
-        <p className="text-slate-400 text-sm font-bold uppercase">{team}</p>
+  <div className="group glass-panel h-80 rounded-[2.5rem] overflow-hidden relative cursor-pointer hover:border-yellow-400/40 transition-all duration-500">
+     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent z-10" />
+     <img 
+       src={image} 
+       alt={name}
+       className="w-full h-full object-cover object-top opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+     />
+     <div className="absolute bottom-8 left-8 z-20">
+        <div className="inline-block px-2 py-0.5 bg-yellow-400 text-slate-950 text-[9px] font-black uppercase rounded mb-3">
+          {game}
+        </div>
+        <h3 className="text-3xl font-black italic uppercase text-white leading-none tracking-tight mb-1">
+          {name}
+        </h3>
+        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-80">
+          {team}
+        </p>
      </div>
   </div>
 );

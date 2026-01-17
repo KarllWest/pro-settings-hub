@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { translations } from '../translations';
 
+// Визначаємо доступні мови
 type Language = 'en' | 'uk' | 'ru';
 
 interface LanguageContextType {
@@ -11,41 +12,74 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/**
+ * Провайдер мови, який керує станом перекладів по всьому додатку.
+ * Містить логіку пошуку ключів та fallback на англійську.
+ */
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  // Ініціалізація стану: беремо мову з localStorage або ставимо 'en' за замовчуванням
+  const [language, setLanguageState] = useState<Language>(() => {
+    const savedLang = localStorage.getItem('app_lang') as Language;
+    return (savedLang === 'en' || savedLang === 'uk' || savedLang === 'ru') ? savedLang : 'en';
+  });
 
-  // Функція для пошуку вкладених ключів (наприклад, "home.title_start")
-  const getNestedTranslation = (lang: Language, key: string) => {
+  // Функція для зміни мови зі збереженням у браузері
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem('app_lang', lang);
+  }, []);
+
+  /**
+   * Допоміжна функція для доступу до вкладених об'єктів у файлі перекладів.
+   * Наприклад: "home.hero.title" -> translations['en']['home']['hero']['title']
+   */
+  const getNestedTranslation = useCallback((lang: Language, key: string): string | undefined => {
     const keys = key.split('.');
     let current: any = translations[lang];
 
     for (const k of keys) {
-      if (current === undefined) return undefined;
+      if (current === undefined || current === null) return undefined;
       current = current[k];
     }
-    return current;
-  };
 
-  const t = (key: string) => {
-    // 1. Шукаємо поточною мовою
+    return typeof current === 'string' ? current : undefined;
+  }, []);
+
+  /**
+   * Основна функція перекладу.
+   * 1. Шукає ключ у поточній мові.
+   * 2. Якщо не знайдено — бере англійський варіант.
+   * 3. Якщо і там немає — повертає сам ключ (для налагодження).
+   */
+  const t = useCallback((key: string): string => {
     const text = getNestedTranslation(language, key);
-    
-    // 2. Якщо немає — шукаємо англійською (fallback)
-    const fallback = getNestedTranslation('en', key);
+    if (text) return text;
 
-    // 3. Якщо все ще немає — повертаємо сам ключ
-    return text || fallback || key;
-  };
+    const fallback = getNestedTranslation('en', key);
+    return fallback || key;
+  }, [language, getNestedTranslation]);
+
+  // Мемоізація значення контексту для запобігання зайвих перерендерів компонентів
+  const value = useMemo(() => ({
+    language,
+    setLanguage,
+    t
+  }), [language, setLanguage, t]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
+/**
+ * Хук для використання функцій перекладу в компонентах.
+ */
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
   return context;
 };

@@ -1,139 +1,137 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-import type { Player, Team } from '../types';
+import type { Player } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
-import { Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { TeamsFilter } from '../components/TeamsFilter'; // Імпорт оновленого компонента
+import { ShieldOff, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
-// Додаємо проп game, щоб компонент знав, що показувати
 interface GamePageProps {
   game: 'cs2' | 'valorant' | 'dota2';
 }
 
 export default function GamePage({ game }: GamePageProps) {
   const { t } = useLanguage();
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [loading, setLoading] = useState(true);
   
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
 
-  // Скидаємо стейт при зміні гри
-  useEffect(() => {
-    setPlayers([]);
-    setTeams([]);
-    setLoading(true);
-    setSelectedTeam(null);
-    setSearchTerm('');
-    
-    const getData = async () => {
-      // 1. Гравці: Фільтруємо по колонці 'game'
-      const { data: playersData } = await supabase
-        .from('players')
-        .select('*, teams(id, name, logo_url)')
-        .eq('game', game) // <--- ФІЛЬТР
-        .order('id', { ascending: true });
-      
-      if (playersData) setPlayers(playersData as any);
-
-      // 2. Команди (можна теж додати game в teams, але поки вантажимо всі)
-      const { data: teamsData } = await supabase.from('teams').select('*');
-      if (teamsData) setTeams(teamsData);
-
-      setLoading(false);
-    };
-    getData();
-  }, [game]); // Перезапускаємо ефект, коли змінюється гра
-
-  const filteredPlayers = players.filter(player => {
-    const matchesSearch = player.nickname.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          player.real_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTeam = selectedTeam ? player.teams?.id === selectedTeam : true;
-    return matchesSearch && matchesTeam;
-  });
-
-  // Заголовок залежно від гри
   const titles = {
-    cs2: "CS2",
+    cs2: "Counter-Strike 2",
     valorant: "VALORANT",
-    dota2: "DOTA 2"
+    dota2: "Dota 2"
   };
+
+  useEffect(() => {
+    const getData = async () => {
+      setLoading(true);
+      setSelectedTeam(null);
+      setSearchTerm('');
+
+      try {
+        const { data: playersData, error: pError } = await supabase
+          .from('players')
+          .select('*, teams(id, name, logo_url)')
+          .eq('game', game)
+          .order('nickname', { ascending: true });
+
+        if (pError) throw pError;
+        setPlayers((playersData as any) || []);
+      } catch (err) {
+        console.error("Error fetching game data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getData();
+  }, [game]);
+
+  const filteredPlayers = useMemo(() => {
+    return players.filter(player => {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = 
+        player.nickname.toLowerCase().includes(searchLower) || 
+        player.real_name.toLowerCase().includes(searchLower);
+      
+      const matchesTeam = selectedTeam ? player.teams?.id === selectedTeam : true;
+      return matchesSearch && matchesTeam;
+    });
+  }, [searchTerm, selectedTeam, players]);
 
   return (
     <motion.div 
-      key={game} // Змушує React перезапускати анімацію при зміні сторінки
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      exit={{ opacity: 0, y: -20 }} 
-      transition={{ duration: 0.3 }}
-      className="max-w-7xl mx-auto p-8 min-h-screen"
+      key={game}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="min-h-screen bg-slate-950"
     >
       
-      {/* ЗАГОЛОВОК */}
-      <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-        <div>
-          <h2 className="text-4xl font-black mb-2 text-white uppercase italic">{titles[game]} {t('players')}</h2>
-          <p className="text-slate-400">Pro Settings Database</p>
-        </div>
-
-        <div className="relative w-full md:w-72">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-            <Search size={18} />
-          </div>
-          <input 
-            type="text" 
-            placeholder={t('search_placeholder')}
-            className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-yellow-400 transition"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* HEADER SECTION (Без пошуку, він переїхав вниз) */}
+      <div className="max-w-7xl mx-auto px-6 pt-12 pb-2">
+        <div className="space-y-2">
+          <h2 className="text-5xl md:text-6xl font-black text-white uppercase italic tracking-tighter">
+            {titles[game]} <span className="text-yellow-400">{t('players')}</span>
+          </h2>
+          <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-xs">
+            Professional Settings Database
+          </p>
         </div>
       </div>
 
-      {/* --- ПАНЕЛЬ КОМАНД --- */}
-      <div className="mb-10 overflow-x-auto pb-4 no-scrollbar">
-        <div className="flex gap-4">
-          <button 
-            onClick={() => setSelectedTeam(null)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl border transition whitespace-nowrap font-bold ${selectedTeam === null ? 'bg-yellow-400 text-slate-900 border-yellow-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}`}
-          >
-            {t('all_teams').toUpperCase()}
-          </button>
+      {/* --- CONTROL BAR: ТУТ ТЕПЕР І ФІЛЬТР, І ПОШУК --- */}
+      <TeamsFilter 
+        game={game} 
+        selectedTeamId={selectedTeam} 
+        onSelectTeam={setSelectedTeam}
+        searchTerm={searchTerm}        // Передаємо значення пошуку
+        onSearchChange={setSearchTerm} // Передаємо функцію оновлення
+      />
 
-          {teams.map((team) => (
-            <button 
-              key={team.id}
-              onClick={() => setSelectedTeam(team.id === selectedTeam ? null : team.id)}
-              className={`flex items-center gap-3 px-6 py-3 rounded-xl border transition whitespace-nowrap group ${selectedTeam === team.id ? 'bg-slate-700 border-yellow-400 text-white shadow-[0_0_15px_rgba(250,204,21,0.3)]' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}`}
+      {/* MAIN GRID */}
+      <div className="max-w-7xl mx-auto px-6 pb-20">
+        <AnimatePresence mode="popLayout">
+          {loading ? (
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-40 gap-4"
             >
-              <img src={team.logo_url} alt={team.name} className="w-6 h-6 object-contain grayscale group-hover:grayscale-0 transition" />
-              <span className="font-bold">{team.name}</span>
-            </button>
-          ))}
-        </div>
+              <Loader2 className="text-yellow-400 animate-spin" size={48} />
+              <p className="text-slate-500 font-black uppercase tracking-widest text-xs">{t('loading')}...</p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {filteredPlayers.length > 0 ? (
+                filteredPlayers.map((player, index) => (
+                   <motion.div
+                     key={player.id}
+                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: index * 0.05 }}
+                   >
+                     <Link to={`/player/${player.id}`} className="block h-full">
+                       <PlayerCard player={player} />
+                     </Link>
+                   </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-32 bg-slate-900/20 rounded-[3rem] border-2 border-dashed border-white/5">
+                   <ShieldOff size={48} className="mx-auto text-slate-800 mb-4" />
+                   <p className="text-xl font-black uppercase italic text-slate-600 tracking-widest">
+                     {t('no_players')} {selectedTeam && 'in this team'}
+                   </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* СПИСОК */}
-      {loading ? (
-        <div className="text-yellow-400 animate-pulse font-bold text-center py-20">{t('loading')}</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in-up">
-          {filteredPlayers.length > 0 ? (
-            filteredPlayers.map((player) => (
-               <Link key={player.id} to={`/player/${player.id}`}>
-                  <PlayerCard player={player} />
-               </Link>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-               <p className="text-xl">{t('no_players')} ({titles[game]}) 😔</p>
-            </div>
-          )}
-        </div>
-      )}
     </motion.div>
   );
 }

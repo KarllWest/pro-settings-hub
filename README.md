@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# ⚡ KeyBindy - Professional Settings Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+  _  __              ____  _           _       
+ | |/ /___ _   _    | __ )(_)_ __   __| |_   _ 
+ | ' // _ \ | | |   |  _ \| | '_ \ / _` | | | |
+ | . \  __/ |_| |   | |_) | | | | | (_| | |_| |
+ |_|\_\___|\__, |   |____/|_|_| |_|\__,_|\__, |
+           |___/                         |___/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📅 Patch 1.2.0 (Поточний стан)
+**Дата:** 17.01.2026  
+**Що зроблено:**
+- **Career Timeline:** Додано блок історії кар'єри на сторінку гравця. Тепер відображається таймлайн з логотипами команд, роками та досягненнями.
+- **Team Detail Page:** Створено повноцінну сторінку організації. При кліку на команду гравця відкривається сторінка зі списком усіх активних гравців цієї команди в базі.
+- **Admin History Manager:** В адмін-панель додано модальне вікно для керування історією кожного гравця (Add/Delete записів).
+- **Database Schema:** Оновлено структуру БД — створено таблицю `player_history` зі зв'язками по `player_id`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 📅 Patch 1.1.0
+**Що зроблено:**
+- **Admin Console:** Реалізовано основний інтерфейс адмінки з табами (General, Gear, Video, Binds).
+- **Crosshair Preview:** Додано візуальний компонент для перегляду прицілу CS2 прямо в картці гравця.
+- **Image Hosting:** Налаштовано Supabase Storage для завантаження фото гравців та логотипів команд.
+- **Localization:** Впроваджено систему перекладів (UA/EN) через `LanguageContext`.
+
+---
+
+## 📅 Patch 1.0.0 (Base)
+**Що зроблено:**
+- **Project Setup:** Ініціалізація React + Vite + Tailwind + TypeScript.
+- **Database Core:** Створення базових таблиць `players`, `teams`, `setups`.
+- **Navigation:** Налаштовано роутинг для ігор (CS2, Dota 2, Valorant).
+- **UI Kit:** Створено базові картки гравців та систему Toast-сповіщень.
+
+---
+
+## 📝 Нотатки по фіксах (To-Do)
+- [ ] Виправити конфлікт класів `flex hidden` у `Navbar.tsx`.
+- [ ] Видалити `console.log` з `PlayerHistory.tsx` після перевірки синхронізації з БД.
+- [ ] Пофіксити 403 помилку Sentry (або видалити ініціалізацію).
