@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabase';
-import { Trash2, Plus, Save, X, Briefcase } from 'lucide-react';
+import { Trash2, Plus, X, Briefcase } from 'lucide-react';
 
 interface HistoryItem {
   id: number;

@@ -9,7 +9,7 @@ import type { Team } from '../types';
 export default function Home() {
   const { t } = useLanguage();
   const [dbTeams, setDbTeams] = useState<Team[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeams = async () => {

@@ -1,5 +1,5 @@
 import { 
-  Instagram, Monitor, HelpCircle 
+  Instagram, HelpCircle 
 } from 'lucide-react';
 
 // Визначаємо список доступних імен для автокомпліту
