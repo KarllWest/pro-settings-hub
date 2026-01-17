@@ -2,16 +2,16 @@ export const translations = {
   en: {
     // --- NAV & HOME ---
     nav: {
-      home: "ProSettings Hub",
+      home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
     },
     home: {
-      badge: "New Era of Performance",
-      title_start: "ELEVATE YOUR",
-      title_end: "AIM",
-      subtitle: "The ultimate knowledge base for gamers. CS2, Valorant, Dota 2, Warzone. Find the config that makes you a champion.",
+      badge: "The Ultimate Database",
+      title_start: "SETUP LIKE A",
+      title_end: "PRO",
+      subtitle: "Stop guessing. Start dominating. Discover the settings, gears, and configs of the world's best players.",
       btn_find: "FIND CONFIG",
       btn_more: "Learn More",
       choose_title: "CHOOSE DISCIPLINE",
@@ -20,6 +20,12 @@ export const translations = {
         dpi: { title: "DPI & Sensitivity", desc: "Exact mouse sensitivity and zoom multiplier data." },
         crosshair: { title: "Crosshair Codes", desc: "Copy crosshair codes directly into the game in one click." },
         video: { title: "Video Settings", desc: "Resolution and graphics settings for max FPS." }
+      },
+      stats: {
+        profiles: "Pro Profiles",
+        teams: "Top Teams",
+        updates: "Daily Updates",
+        free: "Free Access"
       }
     },
 
@@ -81,16 +87,16 @@ export const translations = {
   uk: {
     // --- NAV & HOME ---
     nav: {
-      home: "ProSettings Hub",
+      home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
     },
     home: {
-      badge: "Нова Ера Продуктивності",
-      title_start: "ПІДНІМИ СВІЙ",
-      title_end: "СКІЛ",
-      subtitle: "Єдина база знань для геймерів. CS2, Valorant, Dota 2, Warzone. Знайди конфіг, який зробить тебе чемпіоном.",
+      badge: "Найкраща База Даних",
+      title_start: "НАЛАШТУЙСЯ ЯК",
+      title_end: "ПРО",
+      subtitle: "Досить вгадувати. Почни домінувати. Дізнайся налаштування, девайси та конфіги найкращих гравців світу.",
       btn_find: "ЗНАЙТИ КОНФІГ",
       btn_more: "Дізнатися більше",
       choose_title: "ОБЕРИ ДИСЦИПЛІНУ",
@@ -99,6 +105,12 @@ export const translations = {
         dpi: { title: "DPI та Сенса", desc: "Точні дані про чутливість мишки та множники зуму." },
         crosshair: { title: "Коди Прицілів", desc: "Копіюй коди прицілів в один клік прямо в гру." },
         video: { title: "Налаштування Відео", desc: "Роздільна здатність та графіка для максимального FPS." }
+      },
+      stats: {
+        profiles: "Про-Профілів",
+        teams: "Топ Команд",
+        updates: "Щоденні Оновлення",
+        free: "Безкоштовний Доступ"
       }
     },
 
@@ -155,16 +167,16 @@ export const translations = {
   ru: {
     // --- NAV & HOME ---
     nav: {
-      home: "ProSettings Hub",
+      home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
     },
     home: {
-      badge: "Новая Эра Производительности",
-      title_start: "ПОДНИМИ СВОЙ",
-      title_end: "СКИЛЛ",
-      subtitle: "Единая база знаний для геймеров. CS2, Valorant, Dota 2, Warzone. Найди конфиг, который сделает тебя чемпионом.",
+      badge: "Лучшая База Данных",
+      title_start: "НАСТРОЙСЯ КАК",
+      title_end: "ПРО",
+      subtitle: "Хватит гадать. Начни доминировать. Узнай настройки, девайсы и конфиги лучших игроков мира.",
       btn_find: "НАЙТИ КОНФИГ",
       btn_more: "Узнать больше",
       choose_title: "ВЫБЕРИ ДИСЦИПЛИНУ",
@@ -173,6 +185,12 @@ export const translations = {
         dpi: { title: "DPI и Сенса", desc: "Точные данные о чувствительности мыши и зуме." },
         crosshair: { title: "Коды Прицелов", desc: "Копируй коды прицелов в один клик прямо в игру." },
         video: { title: "Настройки Видео", desc: "Разрешение и графика для максимального FPS." }
+      },
+      stats: {
+        profiles: "Про-Профилей",
+        teams: "Топ Команд",
+        updates: "Ежедневные Обновления",
+        free: "Бесплатный Доступ"
       }
     },
 
