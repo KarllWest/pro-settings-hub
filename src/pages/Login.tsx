@@ -13,15 +13,38 @@ export default function Login() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // Перевіряємо, чи юзер вже залогінений
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
+  // Функція для перевірки ролі та редіректу
+  const redirectUserBasedOnRole = async (userId: string) => {
+    try {
+      // Використовуємо maybeSingle, щоб не було помилки в консолі, якщо профілю ще немає
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profile?.is_admin) {
+        showToast("Welcome back, Commander! 🫡", 'success');
         navigate('/admin');
+      } else {
+        showToast("Welcome back! 👋", 'success');
+        navigate('/profile');
+      }
+    } catch (error) {
+      // Якщо помилка (або профілю немає) - кидаємо на профіль за замовчуванням
+      navigate('/profile');
+    }
+  };
+
+  // Перевіряємо сесію при завантаженні сторінки
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        redirectUserBasedOnRole(session.user.id);
       }
     };
-    checkUser();
+    checkSession();
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -29,18 +52,20 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+      
+      if (data.user) {
+        // Успішний вхід -> перевіряємо роль
+        await redirectUserBasedOnRole(data.user.id);
+      }
 
-      showToast("Welcome back, Admin! 👋", 'success');
-      navigate('/admin');
     } catch (error: any) {
       showToast(error.message || "Failed to login", 'error');
-    } finally {
       setLoading(false);
     }
   };
@@ -52,7 +77,7 @@ export default function Login() {
       className="min-h-[80vh] flex items-center justify-center p-4"
     >
       <div className="w-full max-w-md relative">
-        {/* Декоративне світіння за формою */}
+        {/* Декоративне світіння */}
         <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-[2.5rem] blur-2xl -z-10" />
 
         <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-8 md:p-10 rounded-[2.5rem] shadow-2xl">
@@ -61,10 +86,10 @@ export default function Login() {
               <Lock className="text-slate-900" size={32} />
             </div>
             <h1 className="text-3xl font-black italic uppercase tracking-tighter text-white">
-              Admin <span className="text-yellow-400">Access</span>
+              Account <span className="text-yellow-400">Access</span>
             </h1>
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">
-              Secure Terminal Login
+              Secure Member Login
             </p>
           </div>
 
@@ -78,14 +103,14 @@ export default function Login() {
                 value={email} 
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-slate-950 border border-white/5 rounded-xl p-4 text-white focus:border-yellow-400 outline-none transition-all placeholder:text-slate-800" 
-                placeholder="admin@keybindy.pro"
+                placeholder="you@example.com"
                 required
               />
             </div>
             
             <div>
               <label className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1 mb-1.5 block">
-                Security Key
+                Password
               </label>
               <input 
                 type="password" 
@@ -105,7 +130,7 @@ export default function Login() {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  <span className="uppercase italic tracking-widest">Authorize</span>
+                  <span className="uppercase italic tracking-widest">Sign In</span>
                 </>
               )}
             </button>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { translations } from '../translations';
 
-// Визначаємо доступні мови
+// Визначаємо доступні мови (мають співпадати з ключами в translations.ts)
 type Language = 'en' | 'uk' | 'ru';
 
 interface LanguageContextType {
@@ -14,24 +14,22 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 /**
  * Провайдер мови, який керує станом перекладів по всьому додатку.
- * Містить логіку пошуку ключів та fallback на англійську.
  */
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  // Ініціалізація стану: беремо мову з localStorage або ставимо 'en' за замовчуванням
+  // Ініціалізація: читаємо з localStorage або ставимо 'en'
   const [language, setLanguageState] = useState<Language>(() => {
     const savedLang = localStorage.getItem('app_lang') as Language;
     return (savedLang === 'en' || savedLang === 'uk' || savedLang === 'ru') ? savedLang : 'en';
   });
 
-  // Функція для зміни мови зі збереженням у браузері
+  // Зміна мови + збереження
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('app_lang', lang);
   }, []);
 
   /**
-   * Допоміжна функція для доступу до вкладених об'єктів у файлі перекладів.
-   * Наприклад: "home.hero.title" -> translations['en']['home']['hero']['title']
+   * Функція для доступу до вкладених ключів (наприклад "home.title")
    */
   const getNestedTranslation = useCallback((lang: Language, key: string): string | undefined => {
     const keys = key.split('.');
@@ -46,10 +44,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   /**
-   * Основна функція перекладу.
-   * 1. Шукає ключ у поточній мові.
-   * 2. Якщо не знайдено — бере англійський варіант.
-   * 3. Якщо і там немає — повертає сам ключ (для налагодження).
+   * Головна функція t()
+   * 1. Шукає переклад поточною мовою.
+   * 2. Якщо немає -> шукає англійською (fallback).
+   * 3. Якщо немає -> повертає ключ.
    */
   const t = useCallback((key: string): string => {
     const text = getNestedTranslation(language, key);
@@ -59,7 +57,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return fallback || key;
   }, [language, getNestedTranslation]);
 
-  // Мемоізація значення контексту для запобігання зайвих перерендерів компонентів
   const value = useMemo(() => ({
     language,
     setLanguage,
@@ -73,9 +70,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-/**
- * Хук для використання функцій перекладу в компонентах.
- */
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {

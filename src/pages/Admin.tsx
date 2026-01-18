@@ -9,7 +9,7 @@ import {
   Cpu, Headphones, Tv, User, Search, Trophy, Users, Loader2, ShieldPlus, Plus, Terminal, Zap, Briefcase
 } from 'lucide-react';
 
-// --- ІМПОРТУЄМО МЕНЕДЖЕР ІСТОРІЇ ---
+// --- ІМПОРТУЄМО МЕНЕДЖЕР ІСТОРІЇ (Створимо його наступним кроком) ---
 import { PlayerHistoryManager } from '../components/admin/PlayerHistoryManager'; 
 
 // Допоміжний компонент для іконок ігор
@@ -135,14 +135,16 @@ export default function Admin() {
         game: formData.game, nickname: formData.nickname, real_name: formData.real_name, 
         team_id: formData.team_id ? parseInt(formData.team_id) : null, 
         avatar_url: formData.avatar_url, instagram_url: formData.instagram_url,
-        hltv_url: formData.hltv_url, dotabuff_url: formData.dotabuff_url
+        hltv_url: formData.hltv_url, dotabuff_url: formData.dotabuff_url,
+        faceit_url: formData.faceit_url // Додав faceit_url
       };
       const sPayload = { 
         mouse: formData.mouse, dpi: formData.dpi, sensitivity: formData.sensitivity, 
         resolution: formData.resolution, hertz: formData.hertz, crosshair_code: formData.crosshair_code,
         keybinds: formData.keybinds, gear: formData.gear, pc_specs: formData.pc_specs,
         graphics_settings: formData.graphics_settings, viewmodel_settings: formData.viewmodel_settings,
-        hud_radar_settings: formData.hud_radar_settings
+        hud_radar_settings: formData.hud_radar_settings, launch_options: formData.launch_options,
+        config_commands: formData.config_commands
       };
       
       if (editingId) {
@@ -192,9 +194,11 @@ export default function Admin() {
   };
 
   // --- CALCULATIONS ---
-  const filteredPlayers = players.filter(p => 
-    p.nickname.toLowerCase().includes(searchQuery.toLowerCase()) && p.game === formData.game
-  );
+  const filteredPlayers = useMemo(() => {
+      return players.filter(p => 
+        p.nickname.toLowerCase().includes(searchQuery.toLowerCase()) && p.game === formData.game
+      );
+  }, [players, searchQuery, formData.game]);
 
   const stats = useMemo(() => ({
     total: players.length,
@@ -277,7 +281,7 @@ export default function Admin() {
                   <span className="font-bold uppercase italic">{t.name}</span>
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <button onClick={() => {setEditingTeamId(t.id); setTeamForm({ name: t.name, logo_url: t.logo_url, game: (t as any).game })}} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg"><Pencil size={16}/></button>
+                   <button onClick={() => {setEditingTeamId(Number(t.id)); setTeamForm({ name: t.name, logo_url: t.logo_url, game: (t as any).game })}} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg"><Pencil size={16}/></button>
                    <button onClick={async () => { if(confirm("Delete team?")) { await supabase.from('teams').delete().eq('id', t.id); fetchData(); } }} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"><Trash2 size={16}/></button>
                 </div>
               </div>
@@ -292,7 +296,7 @@ export default function Admin() {
                 <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-6">
                   <div className="grid grid-cols-3 gap-3">
                     {['cs2', 'dota2', 'valorant'].map(g => (
-                      <button key={g} type="button" onClick={() => setFormData({...formData, game: g})} className={`py-4 rounded-2xl font-black uppercase text-xs border-2 transition-all ${formData.game === g ? 'border-yellow-400 bg-yellow-400/5 text-yellow-400' : 'border-white/5 text-slate-600'}`}>{g}</button>
+                      <button key={g} type="button" onClick={() => setFormData({...formData, game: g as any})} className={`py-4 rounded-2xl font-black uppercase text-xs border-2 transition-all ${formData.game === g ? 'border-yellow-400 bg-yellow-400/5 text-yellow-400' : 'border-white/5 text-slate-600'}`}>{g}</button>
                     ))}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -321,7 +325,6 @@ export default function Admin() {
                 </motion.div>
               )}
 
-              {/* ... (Тут ваші інші таби: Gear, Video, Binds - залишаються без змін) ... */}
               {activeTab === 'gear' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4">
@@ -423,7 +426,7 @@ export default function Admin() {
            {filteredPlayers.map(p => (
              <div key={p.id} className="bg-white/[0.02] backdrop-blur-md p-6 rounded-[2.5rem] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] transition-all hover:-translate-y-1">
                 <div className="flex items-center gap-5">
-                   <img src={p.avatar_url || 'https://www.hltv.org/img/static/player/player_9.png'} className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500" alt="" />
+                   <img src={p.avatar_url || 'https://www.hltv.org/img/static/player/player_9.png'} className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500" alt="" onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }} />
                    <div>
                       <h4 className="font-black text-xl uppercase italic group-hover:text-yellow-400 transition-colors tracking-tight">{p.nickname}</h4>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{p.teams?.name || 'Free Agent'}</p>
@@ -432,7 +435,7 @@ export default function Admin() {
                 <div className="flex flex-col gap-2">
                    <button onClick={() => handleEdit(p)} title="Edit" className="p-3 bg-white/5 rounded-xl border border-white/5 text-slate-400 hover:text-blue-400 hover:bg-blue-400/5 transition-all"><Pencil size={18}/></button>
                    {/* НОВА КНОПКА ІСТОРІЇ */}
-                   <button onClick={() => setHistoryManagerId(p.id)} title="Manage Career History" className="p-3 bg-white/5 rounded-xl border border-white/5 text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><Briefcase size={18}/></button>
+                   <button onClick={() => setHistoryManagerId(Number(p.id))} title="Manage Career History" className="p-3 bg-white/5 rounded-xl border border-white/5 text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><Briefcase size={18}/></button>
                    <button onClick={async () => { if(confirm("Delete player?")) { await supabase.from('setups').delete().eq('player_id', p.id); await supabase.from('players').delete().eq('id', p.id); fetchData(); } }} title="Delete" className="p-3 bg-white/5 rounded-xl border border-white/5 text-slate-400 hover:text-red-500 hover:bg-red-500/5 transition-all"><Trash2 size={18}/></button>
                 </div>
              </div>

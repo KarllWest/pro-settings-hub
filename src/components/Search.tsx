@@ -7,9 +7,9 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface SearchResult {
   id: number;
-  nickname?: string;
-  name?: string;
-  game?: string;
+  nickname?: string; // Для гравця
+  name?: string;     // Для команди
+  game: string;      // Обов'язкове поле
   avatar_url?: string;
   logo_url?: string;
   type: 'player' | 'team';
@@ -23,7 +23,7 @@ export default function Search() {
   const [hasSearched, setHasSearched] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Закриття пошуку при кліку поза ним
+  // Закриття при кліку поза компонентом
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -46,7 +46,6 @@ export default function Search() {
     setHasSearched(true);
 
     try {
-      // Паралельні запити до гравців та команд
       const [playersRes, teamsRes] = await Promise.all([
         supabase
           .from('players')
@@ -55,17 +54,29 @@ export default function Search() {
           .limit(5),
         supabase
           .from('teams')
-          .select('id, name, logo_url')
+          .select('id, name, logo_url, game')
           .ilike('name', `%${searchQuery}%`)
           .limit(3)
       ]);
 
-      const combined: SearchResult[] = [
-        ...(teamsRes.data?.map(t => ({ ...t, type: 'team' as const })) || []),
-        ...(playersRes.data?.map(p => ({ ...p, type: 'player' as const })) || [])
-      ];
+      // Явне маппінг даних для уникнення помилок типів
+      const players: SearchResult[] = (playersRes.data || []).map(p => ({
+        id: p.id,
+        nickname: p.nickname,
+        game: p.game,
+        avatar_url: p.avatar_url,
+        type: 'player'
+      }));
 
-      setResults(combined);
+      const teams: SearchResult[] = (teamsRes.data || []).map(t => ({
+        id: t.id,
+        name: t.name,
+        game: t.game, // Переконайся, що в таблиці teams є колонка game
+        logo_url: t.logo_url,
+        type: 'team'
+      }));
+
+      setResults([...teams, ...players]);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -73,17 +84,22 @@ export default function Search() {
     }
   }, []);
 
-  // Debounce ефект (затримка перед запитом)
+  // Debounce (затримка 400мс)
   useEffect(() => {
     const timer = setTimeout(() => {
-      performSearch(query);
+      if (query) performSearch(query);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [query, performSearch]);
 
+  const handleSelect = () => {
+    setQuery('');
+    setResults([]);
+    setHasSearched(false);
+  };
+
   return (
-    <div ref={searchRef} className="relative w-full max-w-[160px] sm:max-w-xs group">
+    <div ref={searchRef} className="relative w-full group">
       <div className="relative z-[110]">
         <SearchIcon 
           className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
@@ -95,8 +111,8 @@ export default function Search() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('search_placeholder') || "Search..."}
-          className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:border-yellow-400/30 focus:bg-slate-900/80 focus:ring-4 focus:ring-yellow-400/5 transition-all placeholder:text-slate-600 text-white"
+          placeholder={t('common.search_placeholder') || "Search..."}
+          className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:border-yellow-400/30 focus:bg-slate-900/80 focus:ring-4 focus:ring-yellow-400/5 transition-all placeholder:text-slate-600 text-white shadow-inner"
         />
         
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
@@ -122,15 +138,15 @@ export default function Search() {
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            className="absolute top-full mt-3 w-[300px] right-0 sm:left-0 bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-3xl overflow-hidden z-[100] shadow-yellow-400/5"
+            className="absolute top-full mt-3 w-full sm:w-[320px] right-0 sm:left-auto bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-3xl overflow-hidden z-[100] shadow-yellow-400/5"
           >
-            <div className="p-2">
+            <div className="p-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
               {results.length > 0 ? (
                 results.map((item) => (
                   <Link 
                     key={`${item.type}-${item.id}`} 
                     to={item.type === 'team' ? `/team/${item.id}` : `/player/${item.id}`}
-                    onClick={() => { setResults([]); setQuery(''); setHasSearched(false); }}
+                    onClick={() => handleSelect()}
                     className="flex items-center gap-3 p-2.5 hover:bg-white/5 rounded-xl transition-all group"
                   >
                     <div className="relative flex-shrink-0">
@@ -138,6 +154,7 @@ export default function Search() {
                         src={(item.type === 'team' ? item.logo_url : item.avatar_url) || 'https://www.hltv.org/img/static/player/player_9.png'} 
                         className={`w-9 h-9 rounded-lg object-cover border border-white/5 transition-transform group-hover:scale-110 ${item.type === 'team' ? 'bg-slate-950 p-1' : ''}`} 
                         alt="" 
+                        onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
                       />
                       <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-md p-0.5 border border-white/10">
                         {item.type === 'team' ? <Shield size={10} className="text-yellow-400" /> : <User size={10} className="text-blue-400" />}

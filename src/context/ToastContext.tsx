@@ -43,7 +43,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     <ToastContext.Provider value={contextValue}>
       {children}
       
-      {/* ПАНЕЛЬ СПОВІЩЕНЬ */}
+      {/* ПАНЕЛЬ СПОВІЩЕНЬ (Z-index високий, щоб бути поверх всього) */}
       <div className="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none w-full max-w-sm">
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => (

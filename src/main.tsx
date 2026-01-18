@@ -1,20 +1,22 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
-import './index.css';
-import App from './App.tsx';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async' // <-- Перевір імпорт
+import { LanguageProvider } from './context/LanguageContext'
+import { ToastProvider } from './context/ToastContext'
 
-// Отримуємо кореневий елемент
-const rootElement = document.getElementById('root');
-
-if (!rootElement) {
-  throw new Error('Failed to find the root element');
-}
-
-createRoot(rootElement).render(
-  <StrictMode>
-    <HelmetProvider>
-      <App />
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <HelmetProvider> {/* <-- Перевір обгортку */}
+      <BrowserRouter>
+        <LanguageProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </LanguageProvider>
+      </BrowserRouter>
     </HelmetProvider>
-  </StrictMode>
-);
+  </React.StrictMode>,
+)

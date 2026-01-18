@@ -179,7 +179,7 @@ export const TeamsFilter = ({
                   {filteredModalTeams.map((team) => (
                     <button
                       key={team.id}
-                      onClick={() => { onSelectTeam(team.id); setIsExpanded(false); }}
+                      onClick={() => { onSelectTeam(Number(team.id)); setIsExpanded(false); }}
                       className={`
                         flex items-center gap-3 p-3 rounded-xl border text-left transition-all group
                         ${selectedTeamId === team.id

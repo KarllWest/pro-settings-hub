@@ -2,25 +2,57 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Keyboard, Menu, X, LogIn } from 'lucide-react';
+import { Keyboard, Menu, X, LogIn, User, ShieldAlert } from 'lucide-react';
+import { supabase } from '../services/supabase';
 import Search from './Search'; 
 
 export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false); // <-- Додано стан для адміна
 
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
+  // Перевіряємо авторизацію та роль
+  useEffect(() => {
+    const checkUserAndRole = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        // Якщо юзер є, перевіряємо чи він адмін
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', currentUser.id)
+          .single();
+        
+        setIsAdmin(data?.is_admin || false);
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkUserAndRole();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkUserAndRole();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    // ЗМІНИ: w-full, прибрано rounded, додано border-b
     <nav className="sticky top-0 z-[100] w-full border-b border-white/5 bg-slate-950/80 backdrop-blur-xl transition-all duration-300">
       
-      {/* Контейнер для центрування контенту (max-w-[1400px]) */}
       <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-6">
         
         {/* LOGO */}
@@ -28,7 +60,7 @@ export default function Navbar() {
           <div className="bg-yellow-400 text-slate-900 p-2.5 rounded-xl shadow-[0_0_15px_rgba(250,204,21,0.3)] -rotate-6 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
             <Keyboard size={22} strokeWidth={2.5} />
           </div>
-          <div className="flex flex-col leading-none hidden sm:block">
+          <div className="hidden sm:flex flex-col leading-none">
             <span className="text-xl font-black italic uppercase tracking-tighter text-white">
               KEY<span className="text-yellow-400">BINDY</span>
             </span>
@@ -71,13 +103,38 @@ export default function Navbar() {
             ))}
           </div>
 
-          <Link 
-            to="/login" 
-            className="hidden sm:flex items-center gap-2 h-10 px-5 rounded-xl bg-slate-900/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:border-yellow-400/50 hover:bg-slate-800 transition-all group shrink-0"
-          >
-            <LogIn size={14} className="text-yellow-400 group-hover:scale-110 transition-transform" />
-            <span>Login</span>
-          </Link>
+          {/* AUTH BUTTONS */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              {/* Кнопка Адмінки (Тільки для Admin=true) */}
+              {isAdmin && (
+                <Link 
+                  to="/admin" 
+                  className="hidden sm:flex items-center gap-2 h-10 px-4 rounded-xl bg-red-500/10 border border-red-500/50 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all group shrink-0"
+                >
+                  <ShieldAlert size={14} />
+                  <span>Admin</span>
+                </Link>
+              )}
+
+              {/* Кнопка Профілю (Для всіх) */}
+              <Link 
+                to="/profile" 
+                className="hidden sm:flex items-center gap-2 h-10 px-5 rounded-xl bg-yellow-400/10 border border-yellow-400/50 text-[10px] font-black uppercase tracking-widest text-yellow-400 hover:bg-yellow-400 hover:text-slate-900 transition-all group shrink-0 shadow-[0_0_10px_rgba(250,204,21,0.2)]"
+              >
+                <User size={14} className="group-hover:scale-110 transition-transform" />
+                <span>My Profile</span>
+              </Link>
+            </div>
+          ) : (
+            <Link 
+              to="/login" 
+              className="hidden sm:flex items-center gap-2 h-10 px-5 rounded-xl bg-slate-900/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:border-yellow-400/50 hover:bg-slate-800 transition-all group shrink-0"
+            >
+              <LogIn size={14} className="text-yellow-400 group-hover:scale-110 transition-transform" />
+              <span>Login</span>
+            </Link>
+          )}
 
           <button 
             onClick={() => setIsOpen(!isOpen)} 
@@ -88,7 +145,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE MENU (Full Width Dropdown) */}
+      {/* MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
@@ -103,8 +160,20 @@ export default function Navbar() {
               <MobileLink to="/valorant">VALORANT</MobileLink>
               <MobileLink to="/dota2">DOTA 2</MobileLink>
               <div className="h-px bg-white/5 my-2" />
-              <MobileLink to="/guide" isSpecial>{t('nav_guide') || 'Guide'}</MobileLink>
-              <MobileLink to="/login">Login / Admin</MobileLink>
+              
+              {/* Mobile Auth Links */}
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" className="text-sm font-bold uppercase tracking-wider p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all mb-1">
+                      Admin Panel
+                    </Link>
+                  )}
+                  <MobileLink to="/profile">My Profile</MobileLink>
+                </>
+              ) : (
+                <MobileLink to="/login">Login</MobileLink>
+              )}
             </div>
           </motion.div>
         )}
@@ -114,7 +183,6 @@ export default function Navbar() {
 }
 
 // --- SUB-COMPONENTS ---
-
 const NavLink = ({ to, children, active }: { to: string; children: React.ReactNode; active?: boolean }) => (
   <Link 
     to={to} 

@@ -6,9 +6,8 @@ interface PlayerCardProps {
   player: Player;
 }
 
-// Допоміжний компонент для іконки гри зі спрайту
+// Допоміжний компонент для іконки гри (використовує глобальний спрайт з Home/App)
 const GameIcon = ({ game }: { game: string }) => {
-  // Мапимо назву гри на ID з твого спрайту
   const gameMap: Record<string, { id: string, color: string }> = {
     'dota2': { id: '#dota_logo', color: 'text-orange-500' },
     'cs2': { id: '#cs2_logo', color: 'text-yellow-500' },
@@ -20,10 +19,9 @@ const GameIcon = ({ game }: { game: string }) => {
 
   if (!icon) return null;
 
-  // Якщо файл лежить у public/icons.svg
   return (
     <svg className={`w-5 h-5 ${icon.color} fill-current`}>
-      <use href={`/icons.svg${icon.id}`} /> 
+      <use href={icon.id} /> 
     </svg>
   );
 };
@@ -31,6 +29,7 @@ const GameIcon = ({ game }: { game: string }) => {
 export const PlayerCard = ({ player }: PlayerCardProps) => {
   const { t } = useLanguage();
   
+  // Беремо перший сетап або сам об'єкт (залежно від того, як повернула база)
   const setup = player.setups ? (Array.isArray(player.setups) ? player.setups[0] : player.setups) : null;
   const isDota = player.game === 'dota2';
 
@@ -48,11 +47,12 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
           onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
         />
 
-        {/* --- ТУТ ЗАМІНА: Використовуємо GameIcon зі спрайту --- */}
+        {/* Іконка гри */}
         <div className="absolute top-4 left-4 z-20 p-2 bg-black/60 backdrop-blur-md rounded-xl border border-white/10 shadow-lg">
           <GameIcon game={player.game} />
         </div>
 
+        {/* Інформація про гравця */}
         <div className="absolute bottom-0 left-0 w-full p-6 z-20">
           <p className="text-yellow-400/80 text-[10px] font-black uppercase tracking-[0.2em] mb-1 drop-shadow-md">
             {player.real_name || 'Pro Player'}
@@ -62,6 +62,7 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
           </h3>
         </div>
 
+        {/* Логотип команди */}
         {player.teams && (
           <div className="absolute bottom-6 right-6 z-20 w-12 h-12 bg-white/5 backdrop-blur-xl rounded-2xl p-2.5 border border-white/10 shadow-2xl transition-transform group-hover:rotate-6 group-hover:scale-110">
             <img 

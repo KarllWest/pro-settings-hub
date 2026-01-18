@@ -9,18 +9,26 @@
 
   html {
     scroll-behavior: smooth;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   body {
     @apply bg-slate-950 text-slate-50 antialiased selection:bg-yellow-400 selection:text-slate-950;
     
-    /* Глобальний фон з покращеною "кібер-сіткою" */
+    /* Глобальний фон з "кібер-сіткою" */
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     min-height: 100vh;
     overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    isolation: isolate;
   }
 }
 
@@ -30,27 +38,35 @@
     @apply pointer-events-none fixed inset-0;
     background: radial-gradient(
       circle at 50% 0%, 
-      rgba(250, 204, 21, 0.1) 0%, 
+      rgba(250, 204, 21, 0.08) 0%, 
       transparent 70%
     );
     z-index: -1;
   }
 
-  /* Скляна панель (Glassmorphism) — для карток та меню */
+  /* Скляна панель (Glassmorphism) */
   .glass-panel {
     @apply bg-slate-900/40 backdrop-blur-md border border-white/5 shadow-2xl;
   }
 
-  /* Кастомна кнопка, щоб не писати купу класів кожного разу */
-  .btn-primary {
-    @apply px-6 py-3 bg-yellow-400 text-slate-950 font-black uppercase italic 
-           rounded-xl transition-all duration-300 hover:bg-yellow-300 
-           active:scale-95 shadow-lg shadow-yellow-400/10;
+  /* Твій кастомний градієнт тексту */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500;
+  }
+
+  /* Логотип з ефектом */
+  .logo {
+    @apply h-12 transition-all duration-300;
+    will-change: filter;
+  }
+  .logo:hover {
+    filter: drop-shadow(0 0 1.5em rgba(250, 204, 21, 0.4));
+    transform: scale(1.05);
   }
 }
 
 @layer utilities {
-  /* Прибрати скролбар для слайдерів (команди тощо) */
+  /* Прибрати скролбар */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -58,9 +74,39 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* --- АНІМАЦІЯ ДЛЯ БІГУЧОГО РЯДКА (Критично для Home.tsx) --- */
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); }
+  }
+  
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+    width: max-content;
+  }
+  
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+  
+  /* Анімація появи (Fade In) */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+
+  /* Повільне обертання */
+  .animate-spin-slow {
+    animation: spin 20s linear infinite;
+  }
 }
 
-/* Стилізація стандартного скролбару браузера */
+/* Стилізація стандартного скролбару */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -75,20 +121,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-yellow-400;
-}
-
-/* Анімація появи (можна юзати в коді) */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.4s ease-out forwards;
 }

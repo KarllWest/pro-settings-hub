@@ -1,12 +1,18 @@
 export const translations = {
   en: {
+    // --- ROOT KEYS (For direct access) ---
+    loading: "Loading...",
+    players: "Players",
+    back_to: "Back to",
+    nav_guide: "Guide", // Fix for Navbar
+
     // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
-      guide: "Installation Guide",
+      guide: "Guide",
       login: "Admin Access"
     },
     // --- HOME PAGE ---
@@ -62,13 +68,19 @@ export const translations = {
   },
 
   uk: {
+    // --- ROOT KEYS ---
+    loading: "Завантаження...",
+    players: "Гравці",
+    back_to: "Назад до",
+    nav_guide: "Гайд",
+
     // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
-      guide: "Інструкція",
+      guide: "Гайд",
       login: "Вхід"
     },
     // --- HOME PAGE ---
@@ -124,13 +136,19 @@ export const translations = {
   },
 
   ru: {
+    // --- ROOT KEYS ---
+    loading: "Загрузка...",
+    players: "Игроки",
+    back_to: "Назад к",
+    nav_guide: "Гайд",
+
     // --- NAVIGATION ---
     nav: {
       home: "KeyBindy",
       cs2: "CS2",
       valorant: "Valorant",
       dota: "Dota 2",
-      guide: "Инструкция",
+      guide: "Гайд",
       login: "Вход"
     },
     // --- HOME PAGE ---
@@ -157,7 +175,7 @@ export const translations = {
       loading: "ЗАГРУЗКА...",
       search_placeholder: "Поиск игрока или команды...",
       no_players: "Игроки не найдены",
-      all_teams: "Все Команды",
+      all_teams: "Все Команди",
       download_cfg: "Скачать CFG",
       view_profile: "Профиль",
       teammates: "Тиммейты",

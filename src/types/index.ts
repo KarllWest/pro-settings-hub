@@ -1,14 +1,14 @@
 /**
  * Підтримувані ігрові дисципліни.
- * Додайте сюди нову гру, щоб розширити підтримку по всьому додатку.
  */
 export type GameType = 'cs2' | 'valorant' | 'dota2' | 'pubg' | 'fortnite';
 
 /**
  * Організація (команда), до якої належить гравець.
+ * id може бути number (з бази) або string (якщо це заглушка/fallback).
  */
 export interface Team {
-  id: number;
+  id: number | string;
   name: string;
   logo_url: string;
   game: GameType;
@@ -19,14 +19,14 @@ export interface Team {
  * Профіль професійного гравця.
  */
 export interface Player {
-  id: number;
+  id: number | string;
   game: GameType;
   nickname: string;
   real_name: string;
   avatar_url: string;
   team_id: number | null;
   
-  // Реляція з таблицею teams (з'являється після .select('*, teams(*)'))
+  // Реляція з таблицею teams
   teams?: Team | null;
 
   // Соціальні мережі
@@ -37,14 +37,13 @@ export interface Player {
   liquipedia_url?: string;
 
   /** * Налаштування гравця. 
-   * При запиті через Supabase зазвичай повертається як масив.
+   * При запиті через Supabase повертається як масив (зазвичай 1 елемент).
    */
   setups?: Setup[]; 
 }
 
 /**
  * Технічні налаштування (Config/Hardware).
- * Використовує Record для гнучких JSONB полів з бази даних.
  */
 export interface Setup {
   id: number;
@@ -53,7 +52,6 @@ export interface Setup {
   // --- Основні ігрові параметри ---
   mouse: string;
   dpi: number;
-  /** В CS2/Valorant - чутливість, у Dota 2 - Camera Speed */
   sensitivity: number; 
   zoom_sensitivity: number;
   resolution: string;
@@ -64,9 +62,8 @@ export interface Setup {
   launch_options: string;
   
   // --- JSONB Поля (Налаштування всередині гри) ---
-  /** Налаштування якості графіки (Shadows, Textures тощо) */
   graphics_settings: Record<string, string | number | boolean>;
-  /** Позиція моделі зброї (тільки для шутерів) */
+  
   viewmodel_settings: {
     fov?: number;
     offset_x?: number;
@@ -74,15 +71,12 @@ export interface Setup {
     offset_z?: number;
     presetpos?: number;
   } | Record<string, any>;
-  /** Основні клавіші управління */
+
   keybinds: Record<string, string>;
-  /** Складні або кастомні команди (Jumpthrow тощо) */
   custom_binds: Array<{ name: string; key: string }>;
-  /** Додаткові консольні команди */
   config_commands: Array<{ command: string; value: string }>;
   
   // --- Hardware (Залізо) ---
-  /** Моделі девайсів та посилання на магазини/огляди */
   gear: {
     monitor?: string;
     monitor_link?: string;
@@ -100,7 +94,6 @@ export interface Setup {
     chair_link?: string;
   };
   
-  /** Характеристики системного блоку */
   pc_specs: {
     cpu?: string;
     gpu?: string;
@@ -112,8 +105,28 @@ export interface Setup {
     psu?: string;
   };
 
-  /** Фізичні налаштування монітора (Brightness, Contrast, Black eQualizer) */
   monitor_settings: Record<string, string | number>;
-  /** Налаштування інтерфейсу та мінікарти (особливо важливо для Dota 2) */
   hud_radar_settings: Record<string, string | number>;
+}
+
+/**
+ * Профіль звичайного користувача (для авторизації та редагування свого профілю).
+ */
+export interface UserProfile {
+  id: string; // UUID
+  nickname: string;
+  avatar_url?: string;
+  steam_url?: string;
+  updated_at?: string;
+  
+  // User Gear Info (спрощена версія)
+  mouse_model?: string;
+  mouse_hz?: string;
+  mouse_dpi?: number;
+  mouse_sens?: number;
+  monitor_hz?: string;
+  resolution?: string;
+  
+  // Права доступу
+  is_admin?: boolean;
 }

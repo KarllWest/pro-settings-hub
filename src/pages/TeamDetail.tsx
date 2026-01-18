@@ -82,16 +82,16 @@ export default function TeamDetail() {
   const gameLabel = team.game ? team.game.toUpperCase() : 'GAME';
 
   return (
-    <div className="relative min-h-screen pb-20">
+    <div className="relative min-h-screen pb-32 bg-slate-950">
       <Helmet>
         <title>{team.name} | Pro Roster & Settings | KeyBindy</title>
         <meta name="description" content={`Professional roster and settings for ${team.name} ${gameLabel} team.`} />
       </Helmet>
 
-      <div className="max-w-7xl mx-auto px-6 pt-10">
+      <div className="max-w-[1600px] mx-auto px-6 pt-10">
         <Link 
           to={`/${gameLink}`} 
-          className="inline-flex items-center text-slate-500 hover:text-yellow-400 mb-12 transition-colors font-black uppercase text-[10px] tracking-[0.2em] group"
+          className="inline-flex items-center text-slate-500 hover:text-yellow-400 mb-16 transition-colors font-black uppercase text-xs tracking-[0.2em] group"
         >
           <ArrowLeft size={14} className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
           {t('back_to')} {gameLabel}
@@ -102,10 +102,11 @@ export default function TeamDetail() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row items-center gap-10 mb-20"
+          className="flex flex-col md:flex-row items-center gap-16 mb-24"
         >
-          <div className="w-48 h-48 md:w-64 md:h-64 bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[3.5rem] p-10 flex items-center justify-center shadow-3xl relative group">
-            <div className="absolute inset-0 bg-yellow-400/5 rounded-[3.5rem] blur-2xl group-hover:bg-yellow-400/10 transition-colors" />
+          {/* Logo Container - Made Larger */}
+          <div className="w-56 h-56 md:w-80 md:h-80 bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[3rem] p-12 flex items-center justify-center shadow-3xl relative group shrink-0">
+            <div className="absolute inset-0 bg-yellow-400/5 rounded-[3rem] blur-3xl group-hover:bg-yellow-400/10 transition-colors" />
             <img 
               src={team.logo_url} 
               alt={team.name} 
@@ -114,44 +115,47 @@ export default function TeamDetail() {
           </div>
 
           <div className="text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5 mb-4">
-              {/* ВИПРАВЛЕННЯ: додано "as any" */}
-              <Icon name={`${gameLink}_logo` as any} className="w-4 h-4 fill-current text-slate-400" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{gameLabel} Division</span>
+            <div className="inline-flex items-center gap-3 bg-white/5 px-5 py-2 rounded-full border border-white/5 mb-6">
+              <Icon name={`${gameLink}_logo` as any} className="w-5 h-5 fill-current text-slate-400" />
+              <span className="text-xs font-black uppercase tracking-widest text-slate-400">{gameLabel} Division</span>
             </div>
             
-            <h1 className="text-7xl md:text-9xl font-black italic uppercase tracking-tighter text-white leading-none mb-4">
+            {/* Team Name - Huge Typography */}
+            <h1 className="text-7xl md:text-[10rem] font-black italic uppercase tracking-tighter text-white leading-[0.85] mb-6">
               {team.name}
             </h1>
             
-            <div className="flex items-center justify-center md:justify-start gap-3 text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">
-              <Users size={16} className="text-yellow-400" />
-              <span>{players.length} {t('players')} Active Roster</span>
+            <div className="flex items-center justify-center md:justify-start gap-3 text-slate-500 font-bold uppercase tracking-[0.2em] text-sm">
+              <Users size={20} className="text-yellow-400" />
+              <span>{players.length} Active Players</span>
             </div>
           </div>
         </motion.div>
 
         {/* PLAYERS GRID */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-4">
+        <div className="space-y-12">
+          <div className="flex items-center gap-6">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <h2 className="text-xl font-black italic uppercase text-white tracking-widest">
+            <h2 className="text-2xl font-black italic uppercase text-white tracking-[0.2em]">
               Active <span className="text-yellow-400">Roster</span>
             </h2>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
 
           {players.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
               {players.map((player) => (
-                <Link key={player.id} to={`/player/${player.id}`} className="block h-full">
-                  <PlayerCard player={player} />
+                <Link key={player.id} to={`/player/${player.id}`} className="block h-full group">
+                  {/* Using PlayerCard but adding hover scale effect */}
+                  <div className="transition-transform duration-300 group-hover:-translate-y-2 h-full">
+                     <PlayerCard player={player} />
+                  </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center bg-white/[0.02] rounded-[3rem] border-2 border-dashed border-white/5">
-              <p className="text-slate-600 font-bold uppercase text-xs tracking-widest">
+            <div className="py-32 text-center bg-white/[0.02] rounded-[3rem] border-2 border-dashed border-white/5">
+              <p className="text-slate-600 font-bold uppercase text-xs tracking-[0.3em]">
                 No active players found for this roster
               </p>
             </div>
