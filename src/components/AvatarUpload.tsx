@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { supabase } from '../services/supabase';
-import { Loader2, User, Upload } from 'lucide-react';
+import { Upload, Loader2, Camera } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 interface Props {
-  url: string | null;
-  size?: number; // Розмір у пікселях (опціонально)
-  onUpload: (url: string) => void;
   userId: string;
+  url: string | null;
+  onUpload: (url: string) => void;
 }
 
-export default function AvatarUpload({ url, onUpload, userId }: Props) {
-  const [uploading, setUploading] = useState(false);
+export default function AvatarUpload({ userId, url, onUpload }: Props) {
   const { showToast } = useToast();
+  const [uploading, setUploading] = useState(false);
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -24,11 +23,10 @@ export default function AvatarUpload({ url, onUpload, userId }: Props) {
 
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      // Використовуємо timestamp для унікальності та userId для безпеки
-      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const fileName = `${userId}-${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      // 1. Завантажуємо файл
+      // 1. Завантажуємо в Supabase Storage (bucket 'avatars')
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
@@ -41,8 +39,8 @@ export default function AvatarUpload({ url, onUpload, userId }: Props) {
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
       
       onUpload(data.publicUrl);
-      showToast('Avatar uploaded successfully!', 'success');
-      
+      showToast('Avatar uploaded!', 'success');
+
     } catch (error: any) {
       showToast(error.message, 'error');
     } finally {
@@ -51,47 +49,40 @@ export default function AvatarUpload({ url, onUpload, userId }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative group w-40 h-40">
-        <div className="w-full h-full rounded-[2rem] overflow-hidden border-4 border-slate-800 bg-slate-900 shadow-2xl relative">
-          
-          {/* Зображення */}
-          {url ? (
-            <img
-              src={url}
-              alt="Avatar"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-100 group-hover:opacity-50"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-700 bg-slate-950 group-hover:text-slate-500 transition-colors">
-              <User size={64} />
+    <div className="relative group w-32 h-32 md:w-40 md:h-40">
+      <div className="w-full h-full rounded-[2rem] overflow-hidden border-4 border-slate-800 bg-slate-900 shadow-xl relative">
+        {url ? (
+          <img
+            src={url}
+            alt="Avatar"
+            className="w-full h-full object-cover object-top"
+          />
+        ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-700">
+                <Camera size={40} />
             </div>
-          )}
+        )}
+        
+        {/* Оверлей при завантаженні */}
+        {uploading && (
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
+            <Loader2 className="animate-spin text-yellow-400" />
+          </div>
+        )}
+      </div>
 
-          {/* Індикатор завантаження */}
-          {uploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 z-20">
-              <Loader2 className="text-yellow-400 animate-spin" size={32} />
-            </div>
-          )}
-
-          {/* Оверлей з кнопкою (при наведенні) */}
-          <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
-            <div className="bg-yellow-400 text-slate-900 p-3 rounded-xl shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
-               {uploading ? <Loader2 className="animate-spin" size={24} /> : <Upload size={24} />}
-            </div>
-            <span className="text-[10px] font-black uppercase text-white tracking-widest mt-3 drop-shadow-md">
-              Change Photo
-            </span>
+      {/* Кнопка завантаження */}
+      <div className="absolute -bottom-2 -right-2">
+        <label className="cursor-pointer bg-yellow-400 text-slate-900 p-3 rounded-xl shadow-lg hover:bg-yellow-300 transition-transform active:scale-95 flex items-center justify-center">
+            {uploading ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} />}
             <input
-              type="file"
-              accept="image/*"
-              onChange={uploadAvatar}
-              disabled={uploading}
-              className="hidden"
+            style={{ visibility: 'hidden', position: 'absolute' }}
+            type="file"
+            accept="image/*"
+            onChange={uploadAvatar}
+            disabled={uploading}
             />
-          </label>
-        </div>
+        </label>
       </div>
     </div>
   );

@@ -12,13 +12,14 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   
   const [user, setUser] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false); // <-- Додано стан для адміна
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); // <--- Додали стан для аватарки
 
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Перевіряємо авторизацію та роль
+  // Перевіряємо авторизацію, роль та аватарку
   useEffect(() => {
     const checkUserAndRole = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -26,16 +27,18 @@ export default function Navbar() {
       setUser(currentUser);
 
       if (currentUser) {
-        // Якщо юзер є, перевіряємо чи він адмін
+        // Отримуємо і адмінку, і аватарку одним запитом
         const { data } = await supabase
           .from('profiles')
-          .select('is_admin')
+          .select('is_admin, avatar_url')
           .eq('id', currentUser.id)
-          .single();
+          .maybeSingle();
         
         setIsAdmin(data?.is_admin || false);
+        setAvatarUrl(data?.avatar_url || null);
       } else {
         setIsAdmin(false);
+        setAvatarUrl(null);
       }
     };
 
@@ -94,7 +97,7 @@ export default function Navbar() {
                 onClick={() => setLanguage(lang)}
                 className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
                   language === lang 
-                  ? 'bg-yellow-400 text-slate-950 shadow-md' 
+                  ? 'bg-yellow-400 text-slate-900 shadow-md' 
                   : 'text-slate-500 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -106,7 +109,7 @@ export default function Navbar() {
           {/* AUTH BUTTONS */}
           {user ? (
             <div className="flex items-center gap-3">
-              {/* Кнопка Адмінки (Тільки для Admin=true) */}
+              {/* Кнопка Адмінки */}
               {isAdmin && (
                 <Link 
                   to="/admin" 
@@ -117,12 +120,16 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* Кнопка Профілю (Для всіх) */}
+              {/* Кнопка Профілю (З аватаркою) */}
               <Link 
                 to="/profile" 
                 className="hidden sm:flex items-center gap-2 h-10 px-5 rounded-xl bg-yellow-400/10 border border-yellow-400/50 text-[10px] font-black uppercase tracking-widest text-yellow-400 hover:bg-yellow-400 hover:text-slate-900 transition-all group shrink-0 shadow-[0_0_10px_rgba(250,204,21,0.2)]"
               >
-                <User size={14} className="group-hover:scale-110 transition-transform" />
+                {avatarUrl ? (
+                   <img src={avatarUrl} alt="Avatar" className="w-5 h-5 rounded-full object-cover border border-yellow-400/50" />
+                ) : (
+                   <User size={14} className="group-hover:scale-110 transition-transform" />
+                )}
                 <span>My Profile</span>
               </Link>
             </div>
@@ -165,7 +172,7 @@ export default function Navbar() {
               {user ? (
                 <>
                   {isAdmin && (
-                    <Link to="/admin" className="text-sm font-bold uppercase tracking-wider p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all mb-1">
+                    <Link to="/admin" onClick={() => setIsOpen(false)} className="text-sm font-bold uppercase tracking-wider p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all mb-1 block">
                       Admin Panel
                     </Link>
                   )}
@@ -200,14 +207,10 @@ const NavLink = ({ to, children, active }: { to: string; children: React.ReactNo
   </Link>
 );
 
-const MobileLink = ({ to, children, isSpecial }: { to: string, children: React.ReactNode, isSpecial?: boolean }) => (
+const MobileLink = ({ to, children }: { to: string, children: React.ReactNode }) => (
   <Link 
     to={to} 
-    className={`text-sm font-bold uppercase tracking-wider p-4 rounded-xl transition-all ${
-      isSpecial 
-        ? 'bg-yellow-400 text-black shadow-lg' 
-        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-    }`}
+    className="text-sm font-bold uppercase tracking-wider p-4 rounded-xl transition-all text-slate-300 hover:bg-white/5 hover:text-white block"
   >
     {children}
   </Link>
