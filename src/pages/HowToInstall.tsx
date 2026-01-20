@@ -5,18 +5,22 @@ import {
   FolderOpen, Terminal, FileCode, Copy, 
   MousePointer2, Info, ChevronRight, Check, ArrowLeft 
 } from 'lucide-react';
-import { useToast } from '../context/ToastContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext'; // Ensure this path is correct
+import { useLanguage } from '../context/LanguageContext'; // Ensure this path is correct
 import { Helmet } from 'react-helmet-async';
 
+// Define the GameType strictly
 type GameType = 'cs2' | 'dota2';
 
 export default function HowToInstall() {
   const [activeGame, setActiveGame] = useState<GameType>('cs2');
   const [isCopying, setIsCopying] = useState(false);
-  const { showToast } = useToast();
+  
+  // Use a fallback if context hooks are not yet fully implemented or mocking
+  const { showToast } = useToast(); 
   const { t } = useLanguage();
 
+  // Strongly typed paths object
   const paths: Record<GameType, string> = {
     cs2: `C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\game\\csgo\\cfg`,
     dota2: `C:\\Program Files (x86)\\Steam\\steamapps\\common\\dota 2 beta\\game\\dota\\cfg`
@@ -29,6 +33,7 @@ export default function HowToInstall() {
       showToast(t('common.copied') || "Path copied to clipboard!", "success");
       setTimeout(() => setIsCopying(false), 2000);
     } catch (err) {
+      console.error("Failed to copy:", err);
       showToast("Failed to copy path", "error");
     }
   };

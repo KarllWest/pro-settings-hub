@@ -10,63 +10,52 @@
   html {
     scroll-behavior: smooth;
     width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    @apply bg-slate-950 text-slate-50 antialiased selection:bg-yellow-400 selection:text-slate-950;
-    
-    /* Глобальний фон з "кібер-сіткою" */
-    background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    min-height: 100vh;
     overflow-x: hidden;
   }
 
+  body {
+    /* Використовуємо змінні з tailwind.config.js */
+    @apply bg-background text-slate-200 antialiased selection:bg-primary selection:text-background font-sans;
+    
+    /* Текстура фону для преміум ефекту */
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(250, 204, 21, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
   #root {
-    width: 100%;
+    @apply min-h-screen flex flex-col;
     isolation: isolate;
+  }
+
+  /* Заголовки */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-black italic uppercase tracking-tighter text-white;
   }
 }
 
 @layer components {
-  /* Ефект "Світіння" (Glow) */
-  .glow-bg {
-    @apply pointer-events-none fixed inset-0;
-    background: radial-gradient(
-      circle at 50% 0%, 
-      rgba(250, 204, 21, 0.08) 0%, 
-      transparent 70%
-    );
-    z-index: -1;
+  /* --- UI KIT: ATOMS --- */
+
+  /* Скляна панель (заміна старого .glass-panel) */
+  .glass {
+    @apply bg-surface/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+  
+  /* Інтерактивна картка */
+  .glass-hover {
+    @apply glass transition-all duration-300 hover:bg-surface/60 hover:border-white/10 hover:shadow-primary/5 hover:-translate-y-1;
   }
 
-  /* Скляна панель (Glassmorphism) */
-  .glass-panel {
-    @apply bg-slate-900/40 backdrop-blur-md border border-white/5 shadow-2xl;
-  }
-
-  /* Твій кастомний градієнт тексту */
+  /* Текст з градієнтом */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500;
-  }
-
-  /* Логотип з ефектом */
-  .logo {
-    @apply h-12 transition-all duration-300;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 1.5em rgba(250, 204, 21, 0.4));
-    transform: scale(1.05);
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-400;
   }
 }
 
 @layer utilities {
-  /* Прибрати скролбар */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -75,12 +64,7 @@
     scrollbar-width: none;
   }
 
-  /* --- АНІМАЦІЯ ДЛЯ БІГУЧОГО РЯДКА (Критично для Home.tsx) --- */
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-33.33%); }
-  }
-  
+  /* Анімація для бігучого рядка */
   .animate-scroll {
     animation: scroll 40s linear infinite;
     width: max-content;
@@ -89,36 +73,16 @@
   .animate-scroll:hover {
     animation-play-state: paused;
   }
-  
-  /* Анімація появи (Fade In) */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out forwards;
-  }
-
-  /* Повільне обертання */
-  .animate-spin-slow {
-    animation: spin 20s linear infinite;
-  }
 }
 
-/* Стилізація стандартного скролбару */
+/* Кастомний скролбар */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  @apply bg-slate-950;
+  @apply bg-background;
 }
-
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 rounded-full border-2 border-slate-950 transition-colors;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-yellow-400;
+  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
 }
