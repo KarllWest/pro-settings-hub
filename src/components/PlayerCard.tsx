@@ -65,13 +65,21 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
         {/* Логотип команди */}
         {player.teams && (
           <div className="absolute bottom-6 right-6 z-20 w-12 h-12 bg-white/5 backdrop-blur-xl rounded-2xl p-2.5 border border-white/10 shadow-2xl transition-transform group-hover:rotate-6 group-hover:scale-110">
-            <img 
-              src={player.teams.logo_url} 
-              alt={player.teams.name} 
+            <img
+              src={player.teams.logo_url}
+              alt={player.teams.name}
               className="w-full h-full object-contain filter drop-shadow-md"
             />
           </div>
         )}
+
+        {/* View Profile overlay */}
+        <div className="absolute inset-0 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-yellow-400 text-slate-950 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+            View Profile
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+          </div>
+        </div>
       </div>
 
       {/* --- НИЖНЯ ЧАСТИНА (ШВИДКА СТАТИСТИКА) --- */}

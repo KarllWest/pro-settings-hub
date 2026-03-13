@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, ArrowRight, Users, Shield, Zap, Monitor } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+
 import { supabase } from '../services/supabase';
 import type { Team } from '../types';
 import { Helmet } from 'react-helmet-async';
 import { PlayerCard } from '../components/PlayerCard'; // Імпортуємо твій компонент
 
 export default function Home() {
-  const {  } = useLanguage();
+
   const [dbTeams, setDbTeams] = useState<Team[]>([]);
   const [trendingPlayers, setTrendingPlayers] = useState<any[]>([]); // Для трендових гравців
   const [searchQuery, setSearchQuery] = useState('');

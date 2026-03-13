@@ -82,7 +82,34 @@ export default function PlayerDetail() {
     return keyName.replace(/_/g, ' ');
   };
 
-  if (!player) return <div className="text-white p-20 font-black italic text-center text-2xl uppercase tracking-widest">{t('common.loading')}...</div>;
+  if (!player) return (
+    <div className="min-h-screen bg-slate-950 p-6 md:p-10 animate-pulse">
+      <div className="max-w-[1600px] mx-auto space-y-16">
+        {/* Header skeleton */}
+        <div className="flex flex-col md:flex-row gap-12 items-center md:items-end">
+          <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2.5rem] bg-slate-800 shrink-0" />
+          <div className="flex-1 w-full space-y-6">
+            <div className="h-24 bg-slate-800 rounded-2xl w-2/3" />
+            <div className="h-6 bg-slate-800/60 rounded-xl w-1/3" />
+            <div className="flex gap-4">
+              <div className="h-14 w-48 bg-slate-800 rounded-2xl" />
+              <div className="h-14 w-14 bg-slate-800 rounded-2xl" />
+              <div className="h-14 w-14 bg-slate-800 rounded-2xl" />
+            </div>
+          </div>
+        </div>
+        {/* Stats grid skeleton */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className="h-64 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+          <div className="h-64 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className="h-56 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+          <div className="h-56 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>

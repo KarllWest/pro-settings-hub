@@ -23,7 +23,7 @@ export default function Search() {
   const [hasSearched, setHasSearched] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Закриття при кліку поза компонентом
+  // Закриття при кліку поза компонентом або ESC
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -31,8 +31,19 @@ export default function Search() {
         setHasSearched(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setQuery('');
+        setResults([]);
+        setHasSearched(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const performSearch = useCallback(async (searchQuery: string) => {
@@ -140,7 +151,7 @@ export default function Search() {
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             className="absolute top-full mt-3 w-full sm:w-[320px] right-0 sm:left-auto bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-3xl overflow-hidden z-[100] shadow-yellow-400/5"
           >
-            <div className="p-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <div className="p-2 max-h-[60vh] overflow-y-auto no-scrollbar">
               {results.length > 0 ? (
                 results.map((item) => (
                   <Link 

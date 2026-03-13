@@ -75,13 +75,23 @@ export default function GamePage({ game }: GamePageProps) {
       </Helmet>
       
       <div className="max-w-[1600px] mx-auto px-6 pt-12 pb-2">
-        <div className="space-y-2">
-          <h2 className="text-5xl md:text-6xl font-black text-white uppercase italic tracking-tighter">
-            {titles[game]} <span className="text-yellow-400">{t('players')}</span>
-          </h2>
-          <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-xs">
-            Professional Settings Database
-          </p>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="space-y-2">
+            <h2 className="text-5xl md:text-6xl font-black text-white uppercase italic tracking-tighter">
+              {titles[game]} <span className="text-yellow-400">{t('players')}</span>
+            </h2>
+            <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-xs">
+              Professional Settings Database
+            </p>
+          </div>
+          {!loading && (
+            <div className="flex items-baseline gap-2 shrink-0">
+              <span className="text-4xl font-black italic text-white">{filteredPlayers.length}</span>
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500">
+                {filteredPlayers.length !== players.length ? `of ${players.length} ` : ''}players
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

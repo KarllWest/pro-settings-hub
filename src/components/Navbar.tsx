@@ -88,9 +88,8 @@ export default function Navbar() {
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4 flex-1 justify-end">
           <div className="hidden xl:block w-full max-w-[280px]">
-             {/* Assuming Search component accepts className for customization */}
              <div className="opacity-80 hover:opacity-100 transition-opacity">
-                <Search /> 
+                <Search />
              </div>
           </div>
 
