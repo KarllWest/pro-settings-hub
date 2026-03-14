@@ -7,9 +7,9 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface SearchResult {
   id: number;
-  nickname?: string; // Для гравця
-  name?: string;     // Для команди
-  game: string;      // Обов'язкове поле
+  nickname?: string;
+  name?: string;
+  game: string;
   avatar_url?: string;
   logo_url?: string;
   type: 'player' | 'team';
@@ -23,7 +23,6 @@ export default function Search() {
   const [hasSearched, setHasSearched] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Закриття при кліку поза компонентом або ESC
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -67,35 +66,24 @@ export default function Search() {
           .from('teams')
           .select('id, name, logo_url, game')
           .ilike('name', `%${searchQuery}%`)
-          .limit(3)
+          .limit(3),
       ]);
 
-      // Явне маппінг даних для уникнення помилок типів
       const players: SearchResult[] = (playersRes.data || []).map(p => ({
-        id: p.id,
-        nickname: p.nickname,
-        game: p.game,
-        avatar_url: p.avatar_url,
-        type: 'player'
+        id: p.id, nickname: p.nickname, game: p.game, avatar_url: p.avatar_url, type: 'player',
       }));
-
       const teams: SearchResult[] = (teamsRes.data || []).map(t => ({
-        id: t.id,
-        name: t.name,
-        game: t.game, // Переконайся, що в таблиці teams є колонка game
-        logo_url: t.logo_url,
-        type: 'team'
+        id: t.id, name: t.name, game: t.game, logo_url: t.logo_url, type: 'team',
       }));
 
       setResults([...teams, ...players]);
     } catch (error) {
-      console.error("Search error:", error);
+      console.error('Search error:', error);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Debounce (затримка 400мс)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (query) performSearch(query);
@@ -112,94 +100,86 @@ export default function Search() {
   return (
     <div ref={searchRef} className="relative w-full group">
       <div className="relative z-[110]">
-        <SearchIcon 
-          className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-            query ? 'text-yellow-400' : 'text-slate-500 group-hover:text-slate-400'
-          }`} 
-          size={16} 
+        <SearchIcon
+          className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+            query ? 'text-primary' : 'text-slate-600 group-hover:text-slate-500'
+          }`}
+          size={15}
         />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('common.search_placeholder') || "Search..."}
-          className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:border-yellow-400/30 focus:bg-slate-900/80 focus:ring-4 focus:ring-yellow-400/5 transition-all placeholder:text-slate-600 text-white shadow-inner"
+          placeholder={t('common.search_placeholder') || 'Search...'}
+          className="w-full bg-surface/60 border border-white/[0.07] rounded-xl py-2 pl-9 pr-9 text-sm focus:outline-none focus:border-primary/30 focus:bg-surface focus:ring-2 focus:ring-primary/5 transition-all placeholder:text-slate-700 text-white"
         />
-        
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
           {loading ? (
-            <Loader2 size={14} className="animate-spin text-yellow-400" />
-          ) : (
-            query && (
-              <button 
-                onClick={() => { setQuery(''); setResults([]); }}
-                className="text-slate-500 hover:text-white transition-colors"
-              >
-                <X size={14} />
-              </button>
-            )
-          )}
+            <Loader2 size={13} className="animate-spin text-primary" />
+          ) : query ? (
+            <button
+              onClick={() => { setQuery(''); setResults([]); }}
+              className="text-slate-600 hover:text-white transition-colors"
+            >
+              <X size={13} />
+            </button>
+          ) : null}
         </div>
       </div>
 
-      {/* РЕЗУЛЬТАТИ */}
+      {/* RESULTS DROPDOWN */}
       <AnimatePresence>
         {(results.length > 0 || (hasSearched && query.length >= 2 && !loading)) && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            className="absolute top-full mt-3 w-full sm:w-[320px] right-0 sm:left-auto bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-3xl overflow-hidden z-[100] shadow-yellow-400/5"
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full mt-2 w-full sm:w-[300px] right-0 sm:left-auto bg-surface border border-white/[0.09] rounded-2xl shadow-2xl overflow-hidden z-[100]"
           >
-            <div className="p-2 max-h-[60vh] overflow-y-auto no-scrollbar">
+            <div className="p-1.5 max-h-[60vh] overflow-y-auto no-scrollbar">
               {results.length > 0 ? (
                 results.map((item) => (
-                  <Link 
-                    key={`${item.type}-${item.id}`} 
+                  <Link
+                    key={`${item.type}-${item.id}`}
                     to={item.type === 'team' ? `/team/${item.id}` : `/player/${item.id}`}
-                    onClick={() => handleSelect()}
-                    className="flex items-center gap-3 p-2.5 hover:bg-white/5 rounded-xl transition-all group"
+                    onClick={handleSelect}
+                    className="flex items-center gap-3 p-2.5 hover:bg-white/[0.05] rounded-xl transition-all group"
                   >
                     <div className="relative flex-shrink-0">
-                      <img 
-                        src={(item.type === 'team' ? item.logo_url : item.avatar_url) || 'https://www.hltv.org/img/static/player/player_9.png'} 
-                        className={`w-9 h-9 rounded-lg object-cover border border-white/5 transition-transform group-hover:scale-110 ${item.type === 'team' ? 'bg-slate-950 p-1' : ''}`} 
-                        alt="" 
+                      <img
+                        src={(item.type === 'team' ? item.logo_url : item.avatar_url) || 'https://www.hltv.org/img/static/player/player_9.png'}
+                        className={`w-8 h-8 rounded-lg object-cover border border-white/[0.06] ${item.type === 'team' ? 'bg-background p-1' : ''}`}
+                        alt=""
                         onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
                       />
-                      <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-md p-0.5 border border-white/10">
-                        {item.type === 'team' ? <Shield size={10} className="text-yellow-400" /> : <User size={10} className="text-blue-400" />}
+                      <div className="absolute -bottom-1 -right-1 bg-surface rounded-md p-0.5 border border-white/[0.08]">
+                        {item.type === 'team'
+                          ? <Shield size={9} className="text-primary" />
+                          : <User size={9} className="text-sky-400" />}
                       </div>
                     </div>
-
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-black italic uppercase text-slate-200 group-hover:text-yellow-400 transition-colors truncate">
+                      <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors truncate">
                         {item.type === 'team' ? item.name : item.nickname}
                       </p>
-                      <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest flex items-center gap-1.5">
-                        {item.type === 'team' ? (
-                          'Organization'
-                        ) : (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-slate-700" />
-                            {item.game}
-                          </>
-                        )}
+                      <p className="text-[9px] text-slate-600 uppercase font-black tracking-widest">
+                        {item.type === 'team' ? 'Organization' : item.game}
                       </p>
                     </div>
                   </Link>
                 ))
               ) : (
                 <div className="py-8 px-4 text-center">
-                  <AlertCircle size={24} className="mx-auto text-slate-700 mb-2" />
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">No results found for "{query}"</p>
+                  <AlertCircle size={20} className="mx-auto text-slate-700 mb-2" />
+                  <p className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">No results for "{query}"</p>
                 </div>
               )}
             </div>
-            
+
             {results.length > 0 && (
-              <div className="bg-white/5 px-4 py-2 border-t border-white/5">
-                <p className="text-[8px] text-slate-600 font-black uppercase tracking-[0.2em]">Press ESC to close</p>
+              <div className="bg-white/[0.02] px-4 py-2 border-t border-white/[0.05]">
+                <p className="text-[8px] text-slate-700 font-black uppercase tracking-[0.2em]">ESC to close</p>
               </div>
             )}
           </motion.div>

@@ -45,9 +45,7 @@ function App() {
         <symbol id="icon-liquipedia" viewBox="0 0 24 24"><path fill="currentColor" d="M19.5 4.5h-15v15h15v-15zM7.5 16.5l-1.5-1.5 4.5-4.5-4.5-4.5 1.5-1.5 6 6-6 6z" /></symbol>
       </svg>
       
-      <div className="glow-bg" /> 
-      
-      <div className="relative z-10 flex flex-col min-h-screen bg-slate-950 text-white font-sans selection:bg-yellow-400/30">
+      <div className="relative z-10 flex flex-col min-h-screen bg-background text-white font-sans selection:bg-primary/20">
         <Navbar />
         
         <main className="flex-grow">

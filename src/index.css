@@ -14,13 +14,10 @@
   }
 
   body {
-    /* Використовуємо змінні з tailwind.config.js */
-    @apply bg-background text-slate-200 antialiased selection:bg-primary selection:text-background font-sans;
-    
-    /* Текстура фону для преміум ефекту */
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(250, 204, 21, 0.03) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
+    @apply bg-background text-slate-100 antialiased selection:bg-primary selection:text-background font-sans;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(163, 230, 53, 0.06) 0%, transparent 100%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(56, 189, 248, 0.04) 0%, transparent 100%);
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -30,59 +27,62 @@
     isolation: isolate;
   }
 
-  /* Заголовки */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-black italic uppercase tracking-tighter text-white;
+    @apply font-black text-white;
   }
 }
 
 @layer components {
-  /* --- UI KIT: ATOMS --- */
+  /* Solid card — основний контейнер */
+  .card {
+    @apply bg-surface border border-white/[0.07] rounded-2xl;
+  }
 
-  /* Скляна панель (заміна старого .glass-panel) */
+  .card-hover {
+    @apply card transition-all duration-300 hover:border-white/[0.14] hover:bg-[#101020];
+  }
+
+  /* Зберігаємо glass для компонентів що ще його використовують */
   .glass {
-    @apply bg-surface/40 backdrop-blur-xl border border-white/5 shadow-2xl;
-  }
-  
-  /* Інтерактивна картка */
-  .glass-hover {
-    @apply glass transition-all duration-300 hover:bg-surface/60 hover:border-white/10 hover:shadow-primary/5 hover:-translate-y-1;
+    @apply bg-surface/70 backdrop-blur-xl border border-white/[0.07];
   }
 
-  /* Текст з градієнтом */
+  .glass-hover {
+    @apply glass transition-all duration-300 hover:bg-surface/90 hover:border-white/[0.12];
+  }
+
+  /* Lime → sky градієнт текст */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-sky-400;
+  }
+
+  /* Кнопка з акцентним кольором */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-background text-xs font-bold uppercase tracking-widest transition-all hover:bg-lime-300 active:scale-95;
+  }
+
+  /* Glow ефект на primary елементах */
+  .glow {
+    box-shadow: 0 0 24px rgba(163, 230, 53, 0.2);
   }
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Анімація для бігучого рядка */
   .animate-scroll {
     animation: scroll 40s linear infinite;
     width: max-content;
   }
-  
+
   .animate-scroll:hover {
     animation-play-state: paused;
   }
 }
 
-/* Кастомний скролбар */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-background;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
-}
+/* Thin scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #333350; }

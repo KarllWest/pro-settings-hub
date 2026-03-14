@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-import { 
-  Crosshair, Mouse, Monitor, ArrowLeft, Zap, 
-  Download, Copy, Keyboard, 
-  Cpu, Headphones, Users, Gamepad2, AlertCircle, Move, Map as MapIcon
+import {
+  Crosshair, Mouse, Monitor, ArrowLeft, Zap,
+  Download, Copy, Keyboard,
+  Cpu, Headphones, Users, Gamepad2, AlertCircle, Move, Map as MapIcon, Check,
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
-import { Icon } from '../components/Icon'; 
+import { Icon } from '../components/Icon';
 import { Helmet } from 'react-helmet-async';
-import CrosshairPreview from '../components/CrosshairPreview'; // Переконайся, що файл існує
+import CrosshairPreview from '../components/CrosshairPreview';
 import { PlayerHistory } from '../components/PlayerHistory';
 
 export default function PlayerDetail() {
@@ -20,6 +20,7 @@ export default function PlayerDetail() {
   const { id } = useParams();
   const [player, setPlayer] = useState<any>(null);
   const [teammates, setTeammates] = useState<any[]>([]);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,67 +46,68 @@ export default function PlayerDetail() {
   }, [id]);
 
   const setup = player?.setups ? (Array.isArray(player.setups) ? player.setups[0] : player.setups) : null;
-  const game = player?.game || 'cs2'; 
-  const isCS2 = game === 'cs2';
+  const game = player?.game || 'cs2';
   const isDota = game === 'dota2';
-  const isShooter = isCS2 || game === 'valorant' || game === 'pubg';
+  const isShooter = game === 'cs2' || game === 'valorant' || game === 'pubg';
+
+  const copyValue = (key: string, value: string) => {
+    navigator.clipboard.writeText(value);
+    setCopiedKey(key);
+    showToast('Copied!', 'success');
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   const downloadConfig = () => {
     if (!setup) return;
-    let cfgContent = `// ${player.nickname} ${game.toUpperCase()} Config\n\n`;
-    
+    let cfg = `// ${player.nickname} ${game.toUpperCase()} Config\n\n`;
     if (isDota) {
-      const camSpeed = setup.sensitivity < 100 ? setup.sensitivity * 1000 : setup.sensitivity;
-      cfgContent += `dota_camera_speed "${camSpeed || 3000}"\n`;
+      const cam = setup.sensitivity < 100 ? setup.sensitivity * 1000 : setup.sensitivity;
+      cfg += `dota_camera_speed "${cam || 3000}"\n`;
     } else {
-      cfgContent += `sensitivity "${setup.sensitivity}"\n`;
+      cfg += `sensitivity "${setup.sensitivity}"\n`;
     }
-    
-    const blob = new Blob([cfgContent], { type: 'text/plain' });
+    const blob = new Blob([cfg], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${player.nickname}_${game}.cfg`;
-    link.click();
-    showToast(t('common.copied') || "Config Downloaded", "success");
+    const a = document.createElement('a');
+    a.href = url; a.download = `${player.nickname}_${game}.cfg`; a.click();
+    showToast('Config Downloaded', 'success');
   };
 
-  const getBindLabel = (keyName: string) => {
+  const getBindLabel = (key: string) => {
     if (isDota) {
-      const map: Record<string, string> = { 
-        primary_weapon: "Ability 1", secondary_weapon: "Ability 2", knife: "Ability 3", 
-        he_grenade: "Ability 4", flashbang: "Ability 5", smoke_grenade: "Ultimate", 
-        molotov: "Item 1", jump: "Select Hero", crouch: "Courier" 
+      const map: Record<string, string> = {
+        primary_weapon: 'Ability 1', secondary_weapon: 'Ability 2', knife: 'Ability 3',
+        he_grenade: 'Ability 4', flashbang: 'Ability 5', smoke_grenade: 'Ultimate',
+        molotov: 'Item 1', jump: 'Select Hero', crouch: 'Courier',
       };
-      return map[keyName] || keyName.replace(/_/g, ' ');
+      return map[key] || key.replace(/_/g, ' ');
     }
-    return keyName.replace(/_/g, ' ');
+    return key.replace(/_/g, ' ');
   };
 
+  // --- SKELETON ---
   if (!player) return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-10 animate-pulse">
-      <div className="max-w-[1600px] mx-auto space-y-16">
-        {/* Header skeleton */}
-        <div className="flex flex-col md:flex-row gap-12 items-center md:items-end">
-          <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2.5rem] bg-slate-800 shrink-0" />
-          <div className="flex-1 w-full space-y-6">
-            <div className="h-24 bg-slate-800 rounded-2xl w-2/3" />
-            <div className="h-6 bg-slate-800/60 rounded-xl w-1/3" />
-            <div className="flex gap-4">
-              <div className="h-14 w-48 bg-slate-800 rounded-2xl" />
-              <div className="h-14 w-14 bg-slate-800 rounded-2xl" />
-              <div className="h-14 w-14 bg-slate-800 rounded-2xl" />
+    <div className="min-h-screen bg-background p-6 md:p-10 animate-pulse">
+      <div className="max-w-[1600px] mx-auto space-y-10">
+        <div className="flex flex-col md:flex-row gap-10 items-center md:items-end">
+          <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl bg-surface shrink-0" />
+          <div className="flex-1 w-full space-y-5">
+            <div className="h-20 bg-surface rounded-2xl w-3/4" />
+            <div className="h-5 bg-surface/60 rounded-xl w-1/3" />
+            <div className="flex gap-3">
+              <div className="h-11 w-40 bg-surface rounded-xl" />
+              <div className="h-11 w-11 bg-surface rounded-xl" />
+              <div className="h-11 w-11 bg-surface rounded-xl" />
             </div>
           </div>
         </div>
-        {/* Stats grid skeleton */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          <div className="h-64 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
-          <div className="h-64 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <div className="h-56 bg-surface/50 rounded-2xl border border-white/[0.04]" />
+          <div className="h-56 bg-surface/50 rounded-2xl border border-white/[0.04]" />
         </div>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          <div className="h-56 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
-          <div className="h-56 bg-slate-900/50 rounded-[2.5rem] border border-slate-800" />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <div className="h-48 bg-surface/50 rounded-2xl border border-white/[0.04]" />
+          <div className="h-48 bg-surface/50 rounded-2xl border border-white/[0.04]" />
         </div>
       </div>
     </div>
@@ -115,204 +117,213 @@ export default function PlayerDetail() {
     <>
       <Helmet>
         <title>{player.nickname} | KeyBindy Pro Settings</title>
+        <meta name="description" content={`${player.nickname} (${player.real_name}) pro settings — mouse, video, gear and keybinds.`} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:title" content={`${player.nickname} Pro Settings | KeyBindy`} />
+        <meta property="og:description" content={`${player.nickname} sensitivity, DPI, resolution and full gear setup.`} />
+        {player.avatar_url && <meta property="og:image" content={player.avatar_url} />}
       </Helmet>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-slate-950 text-white p-6 md:p-10 font-sans pb-32">
-        
-        {/* Back Link */}
-        <Link to={`/${game}`} className="inline-flex items-center text-slate-500 hover:text-yellow-400 mb-12 transition-colors font-black uppercase text-xs tracking-[0.2em] group">
-          <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={16} /> 
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-background text-white p-6 md:p-10 pb-32"
+      >
+        {/* Back */}
+        <Link
+          to={`/${game}`}
+          className="inline-flex items-center text-slate-600 hover:text-white mb-10 transition-colors font-bold uppercase text-[11px] tracking-[0.2em] group"
+        >
+          <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={14} />
           {t('common.back_to')} {game}
         </Link>
 
-        <div className="max-w-[1600px] mx-auto space-y-16">
-          
-          {/* HEADER SECTION */}
-          <div className="flex flex-col md:flex-row gap-12 items-center md:items-end">
-            {/* Avatar */}
-            <div className="relative group shrink-0">
-               <img 
-                 src={player.avatar_url} 
-                 className="w-64 h-64 md:w-80 md:h-80 object-cover object-top rounded-[2.5rem] shadow-2xl border-[6px] border-slate-800 bg-slate-800" 
-                 alt={player.nickname} 
-                 onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }} 
-               />
+        <div className="max-w-[1600px] mx-auto space-y-12">
+
+          {/* ── HEADER ─────────────────────────────── */}
+          <div className="flex flex-col md:flex-row gap-10 items-center md:items-end">
+            <div className="relative shrink-0">
+              <img
+                src={player.avatar_url}
+                className="w-56 h-56 md:w-72 md:h-72 object-cover object-top rounded-2xl shadow-2xl border border-white/[0.08] bg-surface"
+                alt={player.nickname}
+                onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+              />
             </div>
 
             <div className="flex-1 text-center md:text-left w-full">
-              <div className="flex flex-col md:flex-row items-center md:items-baseline gap-6 mb-4">
-                {/* Nickname */}
-                <h1 className="text-7xl md:text-9xl font-black italic uppercase tracking-tighter leading-none text-white break-words">
+              <div className="flex flex-col md:flex-row items-center md:items-baseline gap-5 mb-3">
+                <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none text-white break-words">
                   {player.nickname}
                 </h1>
-                
-                {/* Team Badge */}
                 {player.teams && (
-                  <Link to={`/team/${player.teams.id}`} className="flex items-center gap-3 bg-slate-800/80 px-5 py-3 rounded-2xl border border-slate-700 hover:border-yellow-400 hover:bg-slate-800 transition-all group shadow-lg -mt-2">
-                    <img src={player.teams.logo_url} className="h-8 w-8 object-contain" alt="" />
-                    <span className="text-xl md:text-2xl font-black italic text-yellow-400 uppercase tracking-tighter">{player.teams.name}</span>
+                  <Link
+                    to={`/team/${player.teams.id}`}
+                    className="flex items-center gap-2.5 bg-surface px-4 py-2.5 rounded-2xl border border-white/[0.08] hover:border-primary/40 transition-all group"
+                  >
+                    <img src={player.teams.logo_url} className="h-6 w-6 object-contain" alt="" />
+                    <span className="text-lg font-black uppercase tracking-tighter text-primary">{player.teams.name}</span>
                   </Link>
                 )}
               </div>
 
-              <p className="text-2xl md:text-3xl text-slate-500 font-bold mb-10 uppercase tracking-[0.2em]">{player.real_name}</p>
-              
-              <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
-                <button onClick={downloadConfig} className="flex items-center gap-3 px-8 py-5 bg-yellow-400 text-slate-900 rounded-2xl font-black uppercase hover:bg-yellow-300 transition shadow-xl hover:scale-105 active:scale-95 text-sm tracking-widest">
-                  <Download size={22} /> {t('common.download_cfg')}
+              <p className="text-xl text-slate-600 font-bold mb-8 uppercase tracking-[0.2em]">{player.real_name}</p>
+
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
+                <button
+                  onClick={downloadConfig}
+                  className="flex items-center gap-2.5 px-6 py-3.5 bg-primary text-background rounded-xl font-black uppercase text-sm tracking-widest hover:bg-lime-300 transition-all active:scale-95"
+                >
+                  <Download size={18} /> {t('common.download_cfg')}
                 </button>
-                <div className="flex gap-3">
-                  {player.instagram_url && <SocialLink href={player.instagram_url} icon={<Icon name="icon-instagram" className="w-6 h-6"/>} color="hover:border-pink-500" />}
-                  {player.faceit_url && <SocialLink href={player.faceit_url} icon={<Icon name="icon-faceit" className="w-6 h-6"/>} color="hover:border-orange-500" />}
-                  {isDota && player.dotabuff_url && <SocialLink href={player.dotabuff_url} icon={<Icon name="icon-dotabuff" className="w-6 h-6"/>} color="hover:border-red-500" />}
-                  {isDota && player.liquipedia_url && <SocialLink href={player.liquipedia_url} icon={<Icon name="icon-liquipedia" className="w-6 h-6"/>} color="hover:border-blue-400" />}
-                  {isCS2 && player.hltv_url && <SocialLink href={player.hltv_url} icon={<Icon name="icon-hltv" className="w-6 h-6"/>} color="hover:border-blue-500" />}
+                <div className="flex gap-2.5">
+                  {player.instagram_url && <SocialBtn href={player.instagram_url} icon={<Icon name="icon-instagram" className="w-5 h-5" />} />}
+                  {player.faceit_url && <SocialBtn href={player.faceit_url} icon={<Icon name="icon-faceit" className="w-5 h-5" />} />}
+                  {isDota && player.dotabuff_url && <SocialBtn href={player.dotabuff_url} icon={<Icon name="icon-dotabuff" className="w-5 h-5" />} />}
+                  {isDota && player.liquipedia_url && <SocialBtn href={player.liquipedia_url} icon={<Icon name="icon-liquipedia" className="w-5 h-5" />} />}
+                  {game === 'cs2' && player.hltv_url && <SocialBtn href={player.hltv_url} icon={<Icon name="icon-hltv" className="w-5 h-5" />} />}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* HISTORY SECTION */}
-          <div className="border-t border-slate-800/50 pt-10">
-             {player && <PlayerHistory playerId={player.id} />}
+          {/* History */}
+          <div className="border-t border-white/[0.05] pt-8">
+            {player && <PlayerHistory playerId={player.id} />}
           </div>
 
           {setup ? (
-            <div className="space-y-10">
-              {/* --- MOUSE / VIDEO SETTINGS --- */}
+            <div className="space-y-6">
+
+              {/* ── MOUSE / VIDEO / DOTA SETTINGS ─── */}
               {isDota ? (
-                // DOTA LAYOUT
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                  <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl">
-                    <div className="flex items-center gap-4 mb-10 text-yellow-400">
-                      <Move size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">Camera & Interface</h3>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                  <Block title="Camera & Interface" icon={<Move size={22} />} iconColor="text-primary">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <StatCard label="DPI" value={setup.dpi} />
-                      <StatCard label="Cam Speed" value={setup.sensitivity < 100 ? setup.sensitivity * 1000 : setup.sensitivity} highlight />
+                      <StatCard label="Cam Speed" value={setup.sensitivity < 100 ? setup.sensitivity * 1000 : setup.sensitivity} highlight
+                        onCopy={() => copyValue('cam', String(setup.sensitivity < 100 ? setup.sensitivity * 1000 : setup.sensitivity))}
+                        copied={copiedKey === 'cam'}
+                      />
                       <StatCard label="Hz" value={setup.hertz} />
                       <StatCard label="Minimap" value={setup.hud_radar_settings?.hud_scale || '1.0'} />
                     </div>
-                  </div>
-                  <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl">
-                    <div className="flex items-center gap-4 mb-10 text-teal-400">
-                      <MapIcon size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">Minimap Settings</h3>
+                  </Block>
+                  <Block title="Minimap Settings" icon={<MapIcon size={22} />} iconColor="text-teal-400">
+                    <div className="space-y-2">
+                      {setup.hud_radar_settings && Object.entries(setup.hud_radar_settings).map(([key, value]) =>
+                        value ? <SpecRow key={key} label={key.replace(/_/g, ' ')} value={value as string} /> : null
+                      )}
                     </div>
-                    <div className="space-y-4">
-                      {setup.hud_radar_settings && Object.entries(setup.hud_radar_settings).map(([key, value]) => (
-                        value && <SpecRow key={key} label={key.replace(/_/g, ' ')} value={value as string} />
-                      ))}
-                    </div>
-                  </div>
+                  </Block>
                 </div>
               ) : isShooter ? (
-                // SHOOTER LAYOUT (CS2/VALORANT)
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                  <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl h-full">
-                    <div className="flex items-center gap-4 mb-10 text-yellow-400">
-                      <Mouse size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">{t('mouse_settings')}</h3>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-mono">
-                      <StatCard label="DPI" value={setup.dpi} />
-                      <StatCard label="Sens" value={setup.sensitivity} highlight />
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                  <Block title={t('mouse_settings')} icon={<Mouse size={22} />} iconColor="text-primary">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <StatCard label="DPI" value={setup.dpi} onCopy={() => copyValue('dpi', String(setup.dpi))} copied={copiedKey === 'dpi'} />
+                      <StatCard label="Sens" value={setup.sensitivity} highlight onCopy={() => copyValue('sens', String(setup.sensitivity))} copied={copiedKey === 'sens'} />
                       <StatCard label="Zoom" value={setup.zoom_sensitivity || 1} />
-                      <StatCard label="eDPI" value={Math.round(setup.sensitivity * setup.dpi)} />
+                      <StatCard label="eDPI" value={Math.round(setup.sensitivity * setup.dpi)} highlight onCopy={() => copyValue('edpi', String(Math.round(setup.sensitivity * setup.dpi)))} copied={copiedKey === 'edpi'} />
                     </div>
-                  </div>
-                  <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl h-full">
-                    <div className="flex items-center gap-4 mb-10 text-blue-400">
-                      <Monitor size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">{t('video_settings')}</h3>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-mono">
+                  </Block>
+                  <Block title={t('video_settings')} icon={<Monitor size={22} />} iconColor="text-sky-400">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <StatCard label="Res" value={setup.resolution} />
-                      <StatCard label="Hz" value={setup.hertz} />
+                      <StatCard label="Hz" value={setup.hertz} highlight onCopy={() => copyValue('hz', String(setup.hertz))} copied={copiedKey === 'hz'} />
                       <StatCard label="Aspect" value={setup.aspect_ratio} />
                       <StatCard label="Scaling" value={setup.scaling_mode} />
                     </div>
-                  </div>
+                  </Block>
                 </div>
               ) : null}
 
-              {/* --- HARDWARE --- */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                <HardwareBlock title={t('setup_gear')} icon={<Headphones size={32}/>} color="text-indigo-400" items={setup.gear} t={t} />
-                <HardwareBlock title={t('pc_specs')} icon={<Cpu size={32}/>} color="text-cyan-400" items={setup.pc_specs} t={t} />
+              {/* ── HARDWARE ─────────────────────── */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                <HardwareBlock title={t('setup_gear')} icon={<Headphones size={22} />} iconColor="text-indigo-400" items={setup.gear} t={t} />
+                <HardwareBlock title={t('pc_specs')} icon={<Cpu size={22} />} iconColor="text-cyan-400" items={setup.pc_specs} t={t} />
               </div>
 
-              {/* --- BINDS & EXTRAS --- */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-                {/* Keybinds */}
-                <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl">
-                  <div className="flex items-center gap-4 mb-10 text-purple-400">
-                    <Keyboard size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">{t('keybinds')}</h3>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {/* ── BINDS + EXTRAS ───────────────── */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 items-start">
+                <Block title={t('keybinds')} icon={<Keyboard size={22} />} iconColor="text-purple-400">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {setup.keybinds && Object.entries(setup.keybinds).map(([key, val]) => {
                       const label = getBindLabel(key);
                       return label && val ? (
-                        <div key={key} className="flex flex-col justify-center items-center bg-slate-950 p-4 rounded-2xl border border-slate-800/50 hover:border-slate-700 transition">
-                          <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">{label}</span>
-                          <span className="font-mono text-xl font-bold text-yellow-400">{val as string}</span>
+                        <div key={key} className="flex flex-col items-center bg-background p-3.5 rounded-xl border border-white/[0.05] hover:border-white/[0.1] transition-colors">
+                          <span className="text-[9px] text-slate-600 uppercase font-black tracking-widest mb-1">{label}</span>
+                          <span className="font-mono text-lg font-bold text-primary">{val as string}</span>
                         </div>
                       ) : null;
                     })}
                   </div>
-                </div>
+                </Block>
 
-                <div className="flex flex-col gap-8">
-                    {/* Graphics / Viewmodel */}
-                    <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl">
-                      <div className="flex items-center gap-4 mb-8 text-green-400">
-                        <Zap size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">Graphics & {isDota ? 'Video' : 'ViewModel'}</h3>
-                      </div>
-                      <div className="space-y-4">
-                        {isCS2 && setup.viewmodel_settings && (
-                           <>
-                             <SpecRow label="FOV" value={setup.viewmodel_settings.fov} />
-                             <SpecRow label="Offset X" value={setup.viewmodel_settings.offset_x} />
-                             <SpecRow label="Offset Z" value={setup.viewmodel_settings.offset_z} />
-                           </>
-                        )}
-                        {setup.graphics_settings && Object.entries(setup.graphics_settings).slice(0, 5).map(([k, v]) => (
-                           <SpecRow key={k} label={k.replace(/_/g, ' ')} value={v as string} />
-                        ))}
-                      </div>
+                <div className="flex flex-col gap-5">
+                  <Block title={`Graphics & ${isDota ? 'Video' : 'ViewModel'}`} icon={<Zap size={22} />} iconColor="text-green-400">
+                    <div className="space-y-2">
+                      {game === 'cs2' && setup.viewmodel_settings && (
+                        <>
+                          <SpecRow label="FOV" value={setup.viewmodel_settings.fov} />
+                          <SpecRow label="Offset X" value={setup.viewmodel_settings.offset_x} />
+                          <SpecRow label="Offset Z" value={setup.viewmodel_settings.offset_z} />
+                        </>
+                      )}
+                      {setup.graphics_settings && Object.entries(setup.graphics_settings).slice(0, 5).map(([k, v]) => (
+                        <SpecRow key={k} label={k.replace(/_/g, ' ')} value={v as string} />
+                      ))}
                     </div>
+                  </Block>
 
-                    {/* Crosshair */}
-                    {isShooter && setup.crosshair_code && (
-                      <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl">
-                          <div className="flex items-center gap-4 mb-8 text-pink-400">
-                            <Crosshair size={32} /> <h3 className="text-3xl font-black uppercase italic tracking-wide">{t('crosshair')}</h3>
-                          </div>
-                          
-                          <div className="mb-8 flex justify-center bg-slate-950 rounded-3xl p-6 border border-slate-800">
-                             <CrosshairPreview code={setup.crosshair_code} size="lg" />
-                          </div>
-
-                          <div className="flex gap-4">
-                             <input readOnly value={setup.crosshair_code} className="bg-slate-950 text-slate-400 w-full px-6 py-4 rounded-2xl font-mono text-sm border border-slate-800 focus:border-yellow-400 outline-none transition" />
-                             <button onClick={() => {navigator.clipboard.writeText(setup.crosshair_code); showToast("Copied!", "success")}} className="bg-yellow-400 text-slate-900 px-6 rounded-2xl hover:bg-yellow-300 transition hover:scale-105 active:scale-95 shadow-lg">
-                               <Copy size={24} />
-                             </button>
-                          </div>
+                  {isShooter && setup.crosshair_code && (
+                    <Block title={t('crosshair')} icon={<Crosshair size={22} />} iconColor="text-pink-400">
+                      <div className="mb-6 flex justify-center bg-background rounded-2xl p-6 border border-white/[0.05]">
+                        <CrosshairPreview code={setup.crosshair_code} size="lg" />
                       </div>
-                    )}
+                      <div className="flex gap-3">
+                        <input
+                          readOnly
+                          value={setup.crosshair_code}
+                          className="bg-background text-slate-500 w-full px-4 py-3 rounded-xl font-mono text-sm border border-white/[0.07] focus:border-primary/30 outline-none transition"
+                        />
+                        <button
+                          onClick={() => copyValue('crosshair', setup.crosshair_code)}
+                          className={`px-4 rounded-xl transition-all active:scale-95 flex items-center justify-center ${
+                            copiedKey === 'crosshair' ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-primary text-background hover:bg-lime-300'
+                          }`}
+                        >
+                          {copiedKey === 'crosshair' ? <Check size={18} /> : <Copy size={18} />}
+                        </button>
+                      </div>
+                    </Block>
+                  )}
                 </div>
               </div>
 
-              {/* TEAMMATES */}
+              {/* ── TEAMMATES ────────────────────── */}
               {teammates.length > 0 && (
-                <div className="pt-16 border-t border-slate-800/50">
-                  <div className="flex items-center gap-4 mb-12 text-white justify-center">
-                    <Users size={32} /> <h3 className="text-4xl font-black uppercase italic tracking-tighter">{t('common.teammates')}</h3>
+                <div className="pt-12 border-t border-white/[0.05]">
+                  <div className="flex items-center gap-3 mb-10 justify-center text-white">
+                    <Users size={24} />
+                    <h3 className="text-3xl font-black uppercase tracking-tighter">{t('common.teammates')}</h3>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
                     {teammates.map(tm => (
-                      <Link to={`/player/${tm.id}`} key={tm.id} className="group bg-slate-900/50 rounded-[2rem] p-6 border border-slate-800 hover:border-yellow-400 transition text-center shadow-lg hover:-translate-y-2 duration-300">
-                        <img src={tm.avatar_url} alt={tm.nickname} className="w-28 h-28 md:w-32 md:h-32 object-cover object-top rounded-full mx-auto mb-6 bg-slate-950 border-[3px] border-slate-700 group-hover:border-yellow-400 transition-all group-hover:scale-105" onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }} />
-                        <h4 className="text-2xl font-black italic uppercase text-white group-hover:text-yellow-400 transition tracking-tight">{tm.nickname}</h4>
-                        <p className="text-xs text-slate-500 uppercase font-bold tracking-widest mt-1">{tm.real_name}</p>
+                      <Link
+                        to={`/player/${tm.id}`}
+                        key={tm.id}
+                        className="group bg-surface rounded-2xl p-5 border border-white/[0.07] hover:border-primary/30 transition-all text-center hover:-translate-y-1 duration-300"
+                      >
+                        <img
+                          src={tm.avatar_url}
+                          alt={tm.nickname}
+                          className="w-24 h-24 object-cover object-top rounded-xl mx-auto mb-4 bg-background border border-white/[0.07] group-hover:border-primary/30 transition-all"
+                          onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+                        />
+                        <h4 className="text-lg font-black uppercase text-white group-hover:text-primary transition tracking-tight">{tm.nickname}</h4>
+                        <p className="text-[10px] text-slate-600 uppercase font-bold tracking-widest mt-1">{tm.real_name}</p>
                       </Link>
                     ))}
                   </div>
@@ -320,9 +331,9 @@ export default function PlayerDetail() {
               )}
             </div>
           ) : (
-            <div className="text-center py-40 bg-slate-900/50 rounded-[3rem] border-4 border-dashed border-slate-800">
-              <AlertCircle size={64} className="mx-auto text-slate-700 mb-6" />
-              <p className="text-3xl text-slate-600 uppercase font-black italic tracking-widest">Hardware Data Missing</p>
+            <div className="text-center py-32 bg-surface/30 rounded-2xl border border-dashed border-white/[0.07]">
+              <AlertCircle size={48} className="mx-auto text-slate-800 mb-5" />
+              <p className="text-2xl text-slate-700 uppercase font-black tracking-widest">Hardware Data Missing</p>
             </div>
           )}
         </div>
@@ -333,56 +344,90 @@ export default function PlayerDetail() {
 
 // --- HELPERS ---
 
-const StatCard = ({ label, value, highlight }: any) => (
-  <div className={`bg-slate-950 p-5 rounded-3xl border transition-all hover:border-slate-700 h-full flex flex-col justify-center ${highlight ? 'border-yellow-400/20 shadow-[0_0_20px_rgba(250,204,21,0.05)]' : 'border-slate-800'}`}>
-    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1 tracking-[0.2em]">{label}</p>
-    <p className={`text-xl md:text-3xl font-black italic uppercase leading-tight break-words ${highlight ? 'text-yellow-400' : 'text-white'}`}>
-        {value || '-'}
+const Block = ({ title, icon, iconColor, children }: any) => (
+  <div className="bg-surface p-8 rounded-2xl border border-white/[0.07]">
+    <div className={`flex items-center gap-3 mb-7 ${iconColor}`}>
+      {icon}
+      <h3 className="text-xl font-black uppercase tracking-tight text-white">{title}</h3>
+    </div>
+    {children}
+  </div>
+);
+
+const StatCard = ({ label, value, highlight, onCopy, copied }: any) => (
+  <div
+    className={`bg-background p-4 rounded-xl border transition-all flex flex-col justify-between group relative ${
+      highlight ? 'border-primary/20' : 'border-white/[0.05]'
+    } ${onCopy ? 'cursor-pointer hover:border-primary/40' : ''}`}
+    onClick={onCopy}
+    title={onCopy ? 'Click to copy' : undefined}
+  >
+    <p className="text-[9px] text-slate-600 uppercase font-bold tracking-[0.2em] mb-2">{label}</p>
+    <p className={`text-2xl font-black uppercase leading-tight break-words ${highlight ? 'text-primary' : 'text-white'}`}>
+      {value || '—'}
     </p>
+    {onCopy && (
+      <span className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-slate-600">
+        {copied ? <Check size={11} className="text-primary" /> : <Copy size={11} />}
+      </span>
+    )}
   </div>
 );
 
-const SpecRow = ({ label, value }: { label: string, value: string | number }) => (
-  <div className="flex justify-between items-center border-b border-slate-800 pb-3 last:border-0 hover:bg-white/5 px-4 py-2 rounded-xl transition">
-    <span className="text-xs text-slate-400 uppercase font-bold tracking-widest">{label}</span>
-    <span className="text-base font-black text-white uppercase text-right">{value || "-"}</span>
+const SpecRow = ({ label, value }: { label: string; value: string | number }) => (
+  <div className="flex justify-between items-center border-b border-white/[0.04] pb-2.5 last:border-0 px-1 py-2">
+    <span className="text-[11px] text-slate-500 uppercase font-bold tracking-widest">{label}</span>
+    <span className="text-sm font-black text-white uppercase">{value || '—'}</span>
   </div>
 );
 
-const HardwareBlock = ({ title, icon, color, items, t }: any) => (
-  <div className="bg-slate-900/50 p-10 rounded-[2.5rem] border border-slate-800 shadow-xl h-full">
-    <div className={`flex items-center gap-4 mb-10 ${color}`}>
-      {icon} <h3 className="text-3xl font-black uppercase italic tracking-wide">{title}</h3>
+const HardwareBlock = ({ title, icon, iconColor, items, t }: any) => (
+  <Block title={title} icon={icon} iconColor={iconColor}>
+    <div className="space-y-3">
+      {Object.entries(items || {}).map(([key, val]: any) =>
+        val && !key.endsWith('_link') ? (
+          <GearCard
+            key={key}
+            icon={key.includes('mouse') ? Mouse : key.includes('monitor') ? Monitor : key.includes('keyboard') ? Keyboard : Gamepad2}
+            titleKey={t(key) || key}
+            model={val}
+            link={items[`${key}_link`]}
+          />
+        ) : null
+      )}
     </div>
-    <div className="grid grid-cols-1 gap-4">
-      {Object.entries(items || {}).map(([key, val]: any) => (
-        val && !key.endsWith('_link') && (
-          <GearCard key={key} icon={key.includes('mouse') ? Mouse : key.includes('monitor') ? Monitor : key.includes('keyboard') ? Keyboard : Gamepad2} titleKey={t(key) || key} model={val} link={items[`${key}_link`]} />
-        )
-      ))}
-    </div>
-  </div>
+  </Block>
 );
 
 const GearCard = ({ icon: IconComp, titleKey, model, link }: any) => (
-  <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 flex items-center gap-5 group relative overflow-hidden transition-all hover:border-slate-600">
-    <div className="p-4 bg-slate-900 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition shadow-inner">
-        <IconComp size={28} />
+  <div className="bg-background p-4 rounded-xl border border-white/[0.05] flex items-center gap-4 group relative overflow-hidden hover:border-white/[0.1] transition-all">
+    <div className="p-3 bg-surface rounded-xl text-sky-400 group-hover:bg-sky-500 group-hover:text-white transition-colors shrink-0">
+      <IconComp size={22} />
     </div>
-    <div className="flex-1 min-w-0 pr-12">
-      <p className="text-[10px] uppercase font-black text-slate-500 mb-1 tracking-widest">{titleKey}</p>
-      <p className="font-bold text-white text-lg leading-tight truncate">{model || "Unknown"}</p>
+    <div className="flex-1 min-w-0 pr-10">
+      <p className="text-[9px] uppercase font-black text-slate-600 tracking-widest mb-0.5">{titleKey}</p>
+      <p className="font-bold text-white text-base leading-tight truncate">{model || 'Unknown'}</p>
     </div>
     {link && (
-      <a href={link} target="_blank" rel="noreferrer" className="absolute right-4 p-3 bg-yellow-400 text-slate-900 rounded-xl hover:scale-110 transition shadow-lg opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0">
-         <Zap size={18} />
+      <a
+        href={link}
+        target="_blank"
+        rel="noreferrer"
+        className="absolute right-3 p-2 bg-primary text-background rounded-lg opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all hover:bg-lime-300 active:scale-95"
+      >
+        <Zap size={15} />
       </a>
     )}
   </div>
 );
 
-const SocialLink = ({ href, icon, color }: any) => (
-  <a href={href} target="_blank" rel="noreferrer" className={`p-5 bg-slate-800/50 rounded-2xl border border-slate-700 transition-all ${color} group shadow-lg hover:-translate-y-1`}>
-    <span className="text-slate-400 group-hover:scale-110 transition-transform block">{icon}</span>
+const SocialBtn = ({ href, icon }: any) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noreferrer"
+    className="p-3.5 bg-surface rounded-xl border border-white/[0.07] transition-all hover:border-white/[0.15] hover:-translate-y-0.5 text-slate-500 hover:text-white"
+  >
+    {icon}
   </a>
 );

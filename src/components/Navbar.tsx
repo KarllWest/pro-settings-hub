@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext'; 
-import { supabase } from '../services/supabase'; 
+import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../services/supabase';
 import Search from './Search';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, Menu, X, LogIn, User, ShieldAlert, ChevronRight } from 'lucide-react';
@@ -10,7 +10,8 @@ export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [scrolled, setScrolled] = useState(false);
+
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -19,7 +20,12 @@ export default function Navbar() {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Auth logic remains exactly the same
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   useEffect(() => {
     const checkUserAndRole = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -32,7 +38,7 @@ export default function Navbar() {
           .select('is_admin, avatar_url')
           .eq('id', currentUser.id)
           .maybeSingle();
-        
+
         setIsAdmin(data?.is_admin || false);
         setAvatarUrl(data?.avatar_url || null);
       } else {
@@ -53,56 +59,53 @@ export default function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-[100] w-full glass border-b-0">
-      {/* Upper tiny glow line */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+    <nav className={`sticky top-0 z-[100] w-full transition-all duration-300 ${
+      scrolled
+        ? 'bg-background/90 backdrop-blur-xl border-b border-white/[0.06]'
+        : 'bg-background/40 backdrop-blur-md border-b border-transparent'
+    }`}>
 
-      <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-6">
-        
+      <div className="mx-auto flex h-[60px] max-w-[1600px] items-center justify-between px-6">
+
         {/* LOGO */}
-        <Link to="/" className="flex items-center gap-4 group shrink-0 relative">
-          <div className="relative">
-            <div className="absolute inset-0 bg-primary blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-            <div className="relative bg-gradient-to-br from-primary to-orange-500 text-slate-950 p-2.5 rounded-xl shadow-lg -rotate-3 group-hover:rotate-0 transition-transform duration-300">
-              <Keyboard size={24} strokeWidth={2.5} />
-            </div>
+        <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+          <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
+            <Keyboard size={15} className="text-background" strokeWidth={2.5} />
           </div>
-          <div className="hidden sm:flex flex-col leading-none">
-            <span className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-sm">
-              KEY<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">BINDY</span>
-            </span>
-          </div>
+          <span className="font-black text-[15px] uppercase tracking-tight text-white hidden sm:block">
+            KEY<span className="text-primary">BINDY</span>
+          </span>
         </Link>
 
         {/* DESKTOP LINKS */}
-        <div className="hidden lg:flex items-center gap-1 ml-8 shrink-0 bg-surface/30 p-1.5 rounded-full border border-white/5 backdrop-blur-sm">
+        <div className="hidden lg:flex items-center gap-7 ml-10">
           <NavLink to="/cs2" active={isActive('/cs2')}>CS2</NavLink>
           <NavLink to="/valorant" active={isActive('/valorant')}>VALORANT</NavLink>
           <NavLink to="/dota2" active={isActive('/dota2')}>DOTA 2</NavLink>
-          <div className="w-px h-4 bg-white/10 mx-2" />
+          <span className="w-px h-3.5 bg-white/[0.1]" />
           <NavLink to="/guide" active={isActive('/guide')} isSpecial>
-             {t('nav_guide') || 'GUIDE'}
+            {t('nav_guide') || 'Guide'}
           </NavLink>
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-4 flex-1 justify-end">
-          <div className="hidden xl:block w-full max-w-[280px]">
-             <div className="opacity-80 hover:opacity-100 transition-opacity">
-                <Search />
-             </div>
+        <div className="flex items-center gap-3 flex-1 justify-end">
+          <div className="hidden xl:block w-full max-w-[260px]">
+            <div className="opacity-70 hover:opacity-100 transition-opacity">
+              <Search />
+            </div>
           </div>
 
           {/* Lang Switcher */}
-          <div className="hidden md:flex items-center gap-1 p-1 rounded-lg shrink-0">
+          <div className="hidden md:flex items-center gap-0.5">
             {(['en', 'uk', 'ru'] as const).map((lang) => (
-              <button 
+              <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest transition-all ${
-                  language === lang 
-                  ? 'text-primary' 
-                  : 'text-slate-500 hover:text-slate-300'
+                className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                  language === lang
+                    ? 'text-primary'
+                    : 'text-slate-600 hover:text-slate-400'
                 }`}
               >
                 {lang}
@@ -110,48 +113,47 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* AUTH BUTTONS */}
+          {/* AUTH */}
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {isAdmin && (
-                <Link 
-                  to="/admin" 
-                  className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)]"
+                <Link
+                  to="/admin"
+                  className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all"
                   title="Admin Panel"
                 >
-                  <ShieldAlert size={18} />
+                  <ShieldAlert size={15} />
                 </Link>
               )}
-
-              <Link 
-                to="/profile" 
-                className="hidden sm:flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full glass-hover border border-white/10 group"
+              <Link
+                to="/profile"
+                className="hidden sm:flex items-center gap-2 h-8 pl-1.5 pr-3.5 rounded-xl border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all group"
               >
                 {avatarUrl ? (
-                   <img src={avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-primary/20 group-hover:border-primary transition-colors" />
+                  <img src={avatarUrl} alt="Avatar" className="w-5 h-5 rounded-md object-cover" />
                 ) : (
-                   <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary border border-white/10">
-                     <User size={16} />
-                   </div>
+                  <div className="w-5 h-5 rounded-md bg-white/[0.06] flex items-center justify-center">
+                    <User size={11} className="text-slate-500" />
+                  </div>
                 )}
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-300 group-hover:text-white">Profile</span>
+                <span className="text-[11px] font-semibold text-slate-500 group-hover:text-white transition-colors">Profile</span>
               </Link>
             </div>
           ) : (
-            <Link 
-              to="/login" 
-              className="hidden sm:flex items-center gap-2 h-10 px-6 rounded-xl bg-primary text-slate-950 text-xs font-black uppercase tracking-widest hover:bg-yellow-300 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] transition-all transform hover:-translate-y-0.5"
+            <Link
+              to="/login"
+              className="hidden sm:flex items-center gap-1.5 h-8 px-4 rounded-xl bg-primary text-background text-[11px] font-bold uppercase tracking-widest hover:bg-lime-300 transition-colors active:scale-95"
             >
-              <LogIn size={16} strokeWidth={3} />
-              <span>Login</span>
+              <LogIn size={13} strokeWidth={2.5} />
+              Login
             </Link>
           )}
 
-          <button 
-            onClick={() => setIsOpen(!isOpen)} 
-            className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="lg:hidden p-1.5 text-slate-500 hover:text-white rounded-lg hover:bg-white/[0.06] transition-all"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -159,30 +161,31 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden border-t border-white/5 bg-background/95 backdrop-blur-2xl overflow-hidden"
+            transition={{ duration: 0.2 }}
+            className="lg:hidden border-t border-white/[0.06] overflow-hidden bg-background/98 backdrop-blur-2xl"
           >
-            <div className="flex flex-col p-6 gap-2">
-              <div className="mb-6"><Search /></div>
-              
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-2">Games</p>
+            <div className="flex flex-col p-5 gap-1">
+              <div className="mb-4"><Search /></div>
+
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-700 px-3 mb-1">Games</p>
               <MobileLink to="/cs2" active={isActive('/cs2')}>Counter-Strike 2</MobileLink>
               <MobileLink to="/valorant" active={isActive('/valorant')}>VALORANT</MobileLink>
               <MobileLink to="/dota2" active={isActive('/dota2')}>DOTA 2</MobileLink>
-              
-              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
-              
+
+              <div className="h-px bg-white/[0.05] my-3" />
+
               {user ? (
-                <div className="flex flex-col gap-2">
-                   <MobileLink to="/profile">My Profile</MobileLink>
-                   {isAdmin && <MobileLink to="/admin" isRed>Admin Panel</MobileLink>}
-                </div>
+                <>
+                  <MobileLink to="/profile">My Profile</MobileLink>
+                  {isAdmin && <MobileLink to="/admin" isRed>Admin Panel</MobileLink>}
+                </>
               ) : (
-                <Link to="/login" className="flex items-center justify-center w-full py-4 rounded-xl bg-primary text-slate-950 font-black uppercase tracking-widest">
-                  Login Now
+                <Link to="/login" className="flex items-center justify-center w-full py-3 rounded-xl bg-primary text-background font-bold text-sm uppercase tracking-widest">
+                  Login
                 </Link>
               )}
             </div>
@@ -194,29 +197,34 @@ export default function Navbar() {
 }
 
 // --- SUB-COMPONENTS ---
-const NavLink = ({ to, children, active, isSpecial }: { to: string; children: React.ReactNode; active?: boolean, isSpecial?: boolean }) => (
-  <Link 
-    to={to} 
-    className={`relative px-6 py-2.5 rounded-full flex items-center text-[11px] font-black italic uppercase tracking-wider transition-all duration-300 ${
-      active 
-        ? 'text-slate-950 bg-primary shadow-[0_0_15px_rgba(250,204,21,0.4)]' 
-        : isSpecial 
-          ? 'text-primary hover:text-white' 
-          : 'text-slate-400 hover:text-white hover:bg-white/5'
+const NavLink = ({ to, children, active, isSpecial }: {
+  to: string; children: React.ReactNode; active?: boolean; isSpecial?: boolean;
+}) => (
+  <Link
+    to={to}
+    className={`relative text-[11px] font-bold uppercase tracking-widest transition-colors pb-px ${
+      active
+        ? 'text-primary'
+        : isSpecial
+          ? 'text-primary/60 hover:text-primary'
+          : 'text-slate-500 hover:text-white'
     }`}
   >
     {children}
+    {active && (
+      <span className="absolute -bottom-[1px] left-0 right-0 h-px bg-primary rounded-full" />
+    )}
   </Link>
 );
 
 const MobileLink = ({ to, children, active, isRed }: any) => (
-  <Link 
-    to={to} 
-    className={`flex items-center justify-between text-sm font-bold uppercase tracking-wider p-4 rounded-2xl transition-all border border-transparent ${
-      active ? 'bg-white/5 border-white/10 text-white' : 'text-slate-400 hover:bg-white/5'
+  <Link
+    to={to}
+    className={`flex items-center justify-between text-sm font-semibold p-3 rounded-xl transition-all ${
+      active ? 'bg-white/[0.06] text-white' : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
     } ${isRed ? 'text-red-400 hover:bg-red-500/10' : ''}`}
   >
     {children}
-    <ChevronRight size={16} className={active ? 'text-primary' : 'opacity-0'} />
+    <ChevronRight size={14} className={active ? 'text-primary' : 'text-slate-700'} />
   </Link>
 );

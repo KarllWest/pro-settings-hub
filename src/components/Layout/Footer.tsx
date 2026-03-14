@@ -1,98 +1,56 @@
 import { Link } from 'react-router-dom';
-import { Keyboard, Heart, Mail } from 'lucide-react';
+import { Keyboard, Mail } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-white/5 bg-[#020617] relative mt-auto">
-      <div className="mx-auto max-w-[1600px] px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-          
-          {/* 1. БРЕНДИНГ (4 колонки) */}
-          <div className="lg:col-span-4 space-y-6">
-            <Link to="/" className="flex items-center gap-3 group w-fit">
-              <div className="bg-yellow-400 text-black p-2 rounded-xl group-hover:rotate-6 transition-transform duration-300">
-                <Keyboard size={20} strokeWidth={2.5} />
-              </div>
-              <span className="text-xl font-black italic uppercase tracking-tighter text-white">
-                KEY<span className="text-yellow-400">BINDY</span>
-              </span>
-            </Link>
-            <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
-              The ultimate database for professional esports settings. Elevate your gameplay with configurations used by the world's top athletes.
-            </p>
-            <div className="flex gap-3 pt-2">
-              <SocialLink href="mailto:support@keybindy.com" icon={<Mail size={18} />} />
+    <footer className="w-full border-t border-white/[0.05] bg-background mt-auto">
+      <div className="mx-auto max-w-[1600px] px-6 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+          {/* Brand */}
+          <Link to="/" className="flex items-center gap-2 group w-fit">
+            <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
+              <Keyboard size={13} className="text-background" strokeWidth={2.5} />
             </div>
-          </div>
+            <span className="text-sm font-black uppercase tracking-tight text-white">
+              KEY<span className="text-primary">BINDY</span>
+            </span>
+          </Link>
 
-          {/* 2. НАВІГАЦІЯ (2 колонки) */}
-          <div className="lg:col-span-2 lg:col-start-6">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-6">Database</h4>
-            <ul className="space-y-3 text-sm font-medium text-slate-500">
-              <li><FooterLink to="/cs2">Counter-Strike 2</FooterLink></li>
-              <li><FooterLink to="/valorant">Valorant</FooterLink></li>
-              <li><FooterLink to="/dota2">Dota 2</FooterLink></li>
-            </ul>
-          </div>
+          {/* Nav links */}
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {[
+              { to: '/cs2', label: 'CS2' },
+              { to: '/valorant', label: 'Valorant' },
+              { to: '/dota2', label: 'Dota 2' },
+              { to: '/guide', label: 'Guide' },
+            ].map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+            <a
+              href="mailto:support@keybindy.com"
+              className="text-slate-600 hover:text-primary transition-colors"
+              title="Contact"
+            >
+              <Mail size={14} />
+            </a>
+          </nav>
 
-          {/* 3. РЕСУРСИ (2 колонки) */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-6">Resources</h4>
-            <ul className="space-y-3 text-sm font-medium text-slate-500">
-              <li><FooterLink to="/guide">Optimization Guide</FooterLink></li>
-            </ul>
-          </div>
-
-          {/* 4. CONNECT (2 колонки) */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-6">Connect</h4>
-            <ul className="space-y-3 text-sm font-medium text-slate-500">
-              <li>
-                <a href="mailto:support@keybindy.com" className="hover:text-yellow-400 transition-colors block w-fit">
-                  support@keybindy.com
-                </a>
-              </li>
-            </ul>
-          </div>
-
-        </div>
-
-        {/* BOTTOM BAR */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-600 font-medium">
-            &copy; {currentYear} KeyBindy. All rights reserved.
+          {/* Copyright */}
+          <p className="text-[11px] text-slate-700 font-medium shrink-0">
+            &copy; {currentYear} KeyBindy
           </p>
-          <div className="flex items-center gap-6">
-             <span className="text-xs text-slate-700 font-bold uppercase tracking-widest flex items-center gap-2">
-                Server Time: <span className="text-slate-500 font-mono">UTC+0</span>
-             </span>
-             <p className="text-xs text-slate-600 flex items-center gap-1.5">
-               Made with <Heart size={10} className="text-red-500 fill-red-500" /> for Gamers
-             </p>
-          </div>
+
         </div>
       </div>
     </footer>
   );
 }
-
-// --- SUB-COMPONENTS ---
-
-const FooterLink = ({ to, children }: { to: string, children: React.ReactNode }) => (
-  <Link to={to} className="hover:text-yellow-400 transition-colors block w-fit">
-    {children}
-  </Link>
-);
-
-const SocialLink = ({ href, icon }: { href: string, icon: React.ReactNode }) => (
-  <a 
-    href={href} 
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/10 transition-all"
-  >
-    {icon}
-  </a>
-);

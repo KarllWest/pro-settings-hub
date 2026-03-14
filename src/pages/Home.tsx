@@ -1,205 +1,176 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, Users, Shield, Zap, Monitor } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Crosshair, Mouse, Zap } from 'lucide-react';
 
 import { supabase } from '../services/supabase';
 import type { Team } from '../types';
 import { Helmet } from 'react-helmet-async';
-import { PlayerCard } from '../components/PlayerCard'; // Імпортуємо твій компонент
+import { PlayerCard } from '../components/PlayerCard';
+
+const FADE = (delay = 0) => ({
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, delay },
+});
 
 export default function Home() {
-
   const [dbTeams, setDbTeams] = useState<Team[]>([]);
-  const [trendingPlayers, setTrendingPlayers] = useState<any[]>([]); // Для трендових гравців
-  const [searchQuery, setSearchQuery] = useState('');
+  const [trendingPlayers, setTrendingPlayers] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Отримуємо команди для бігучого рядка
       const { data: teamsData } = await supabase.from('teams').select('id, name').limit(15);
       if (teamsData) setDbTeams(teamsData as Team[]);
 
-      // 2. Отримуємо 3 випадкових або топових гравців для секції Trending
-      // (Тут приклад простого запиту, можна налаштувати логіку популярності)
       const { data: playersData } = await supabase
         .from('players')
         .select('*, teams(id, name, logo_url)')
         .limit(3);
-      
       if (playersData) setTrendingPlayers(playersData);
     };
     fetchData();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) console.log("Global search:", searchQuery);
-  };
-
-  // Заглушка, якщо база пуста
   const fallbackTeams = [
-    { id: '1', name: "NAVI" }, { id: '2', name: "Spirit" }, { id: '3', name: "G2" },
-    { id: '4', name: "FaZe" }, { id: '5', name: "Vitality" }, { id: '6', name: "Liquid" }
+    { id: '1', name: 'NAVI' }, { id: '2', name: 'Spirit' }, { id: '3', name: 'G2' },
+    { id: '4', name: 'FaZe' }, { id: '5', name: 'Vitality' }, { id: '6', name: 'Liquid' },
+    { id: '7', name: 'Cloud9' }, { id: '8', name: 'MOUZ' },
   ];
   const displayTeams = dbTeams.length > 0 ? [...dbTeams, ...dbTeams] : [...fallbackTeams, ...fallbackTeams];
 
   return (
-    <div className="relative min-h-screen bg-[#020617] font-sans text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-white overflow-x-hidden">
       <Helmet>
         <title>KeyBindy | Pro Settings Database</title>
-        <meta name="description" content="Best pro player settings and configs." />
+        <meta name="description" content="Exact configs, peripherals and sensitivity settings used by the world's top esports athletes." />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="KeyBindy | Pro Settings Database" />
+        <meta property="og:description" content="Access pro player configs, sensitivity settings and gear used by top esports athletes." />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80" />
       </Helmet>
 
-      {/* --- BACKGROUND (Чистий, статичний) --- */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-         {/* Гігантський декоративний напис */}
-         <div className="absolute top-[5%] -left-[5%] text-[18vw] font-black leading-none text-white/[0.03] select-none uppercase italic rotate-[-5deg]">
-            DOMINATE
-         </div>
-         
-         <img 
-          src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop" 
-          alt="Gaming Background" 
-          className="w-full h-full object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/90 to-[#020617]/50" />
-      </div>
+      <div className="max-w-[1600px] mx-auto px-6">
 
-      <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-32 pb-32">
-        
-        {/* --- HERO SECTION --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24 items-center">
-          
-          {/* LEFT: TEXT & SEARCH */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}
-            className="lg:col-span-7 flex flex-col justify-center relative"
-          >
-            <div className="inline-flex items-center gap-3 self-start px-5 py-2 mb-8 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-md">
-               <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
+        {/* ── HERO ─────────────────────────────────────── */}
+        <section className="pt-24 pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            {/* LEFT */}
+            <motion.div {...FADE(0)} className="lg:col-span-7 xl:col-span-6">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/[0.06]">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
                 </span>
-               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300">The Pro Database</span>
-            </div>
-            
-            <h1 className="text-6xl md:text-8xl xl:text-9xl font-black italic uppercase tracking-tighter leading-[0.85] mb-8 text-white drop-shadow-2xl">
-              SETUP <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">DOMINANCE</span>
-            </h1>
-            
-            <p className="text-slate-400 text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-medium border-l-2 border-white/10 pl-6">
-              Access the exact configurations, peripherals, and sensitivity settings used by the world's top esports athletes.
-            </p>
-
-            {/* SEARCH BAR */}
-            <form onSubmit={handleSearch} className="relative max-w-lg w-full group">
-              <div className="relative flex items-center bg-slate-950/80 backdrop-blur-xl rounded-2xl border border-white/10 focus-within:border-yellow-400/50 transition-colors shadow-2xl">
-                 <div className="pl-6 text-slate-500 group-focus-within:text-yellow-400 transition-colors">
-                    <Search size={22} />
-                 </div>
-                 <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Find player (e.g. s1mple)..." 
-                  className="w-full bg-transparent py-5 px-4 text-lg text-white placeholder:text-slate-600 focus:outline-none"
-                />
-                <button type="submit" className="mr-3 p-3 bg-white/5 hover:bg-yellow-400 hover:text-black rounded-xl text-slate-300 transition-all">
-                  <ArrowRight size={20} strokeWidth={2.5} />
-                </button>
+                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary/80">Live Database</span>
               </div>
-            </form>
-          </motion.div>
 
-          {/* RIGHT: BENTO GRID NAV (Static & Clean) --- */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-5 grid grid-cols-2 gap-4 h-[500px]"
-          >
-            <BentoCard 
-              to="/cs2" 
-              title="CS2" 
-              subtitle="Counter-Strike 2" 
-              bg="https://blog.cs.money/wp-content/uploads/2023/08/cs2-inferno-banana-t-spawn.jpg"
-              className="col-span-2 row-span-2"
-            />
-            <BentoCard 
-              to="/valorant" 
-              title="VAL" 
-              subtitle="Valorant" 
-              bg="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltc9289269ce32d529/66a2d987d606117d91d1777d/VAL_Console_Ep9_A0_Wide.jpg?auto=webp&disable=upscale&height=1055"
-              className="col-span-1 row-span-1"
-            />
-            <BentoCard 
-              to="/dota2" 
-              title="DOTA" 
-              subtitle="Dota 2" 
-              bg="https://cdn.akamai.steamstatic.com/apps/dota2/images/dota2_social.jpg"
-              className="col-span-1 row-span-1"
-            />
-          </motion.div>
-        </div>
+              {/* Heading */}
+              <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-black uppercase leading-[0.88] tracking-tighter mb-6">
+                PRO<br />
+                <span className="text-gradient">SETTINGS</span><br />
+                DATABASE
+              </h1>
 
-        {/* --- TICKER (Команди) --- */}
-        <div className="mb-24 overflow-hidden py-6 border-y border-white/5 bg-slate-900/30 backdrop-blur-sm relative group">
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#020617] to-transparent z-10" />
-            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#020617] to-transparent z-10" />
-            
-            <div className="flex gap-20 animate-scroll whitespace-nowrap group-hover:[animation-play-state:paused] items-center">
-               {displayTeams.map((team, i) => (
-                  <Link 
-                    key={`${team.id}-${i}`} 
-                    to={`/team/${team.id}`}
-                    className="text-4xl font-black italic uppercase text-white/20 hover:text-white transition-colors duration-300 flex items-center gap-2"
-                  >
-                     {team.name}
-                  </Link>
-               ))}
-            </div>
-        </div>
+              <p className="text-slate-500 text-base max-w-md mb-10 leading-relaxed">
+                Access exact configurations, peripherals and sensitivities used by world-class esports athletes.
+              </p>
 
-        {/* --- STATS STRIP --- */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-24">
-           <StatBox icon={<Users size={24} />} val="2.4k" label="Pro Profiles" />
-           <StatBox icon={<Monitor size={24} />} val="150+" label="Verified Teams" />
-           <StatBox icon={<Zap size={24} />} val="Daily" label="Updates" />
-           <StatBox icon={<Shield size={24} />} val="100%" label="Accurate Data" />
-        </div>
+              {/* CTA */}
+              <div className="flex flex-wrap gap-3">
+                <Link to="/cs2" className="btn-primary glow">
+                  Browse CS2 <ArrowRight size={14} />
+                </Link>
+                <Link to="/valorant" className="inline-flex items-center gap-2 h-10 px-5 rounded-xl border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-slate-400 hover:border-white/[0.15] hover:text-white transition-all">
+                  Browse Valorant
+                </Link>
+              </div>
+            </motion.div>
 
-        {/* --- TRENDING SECTION --- */}
-        <div className="mb-24 relative">
-          <div className="absolute -left-6 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-yellow-400/50 to-transparent hidden xl:block" />
+            {/* RIGHT — GAME CARDS */}
+            <motion.div {...FADE(0.15)} className="lg:col-span-5 xl:col-span-6 grid grid-cols-2 gap-3 h-[420px]">
+              <GameCard
+                to="/cs2"
+                label="CS2"
+                sub="Counter-Strike 2"
+                img="https://blog.cs.money/wp-content/uploads/2023/08/cs2-inferno-banana-t-spawn.jpg"
+                accent="#FB923C"
+                className="col-span-2"
+              />
+              <GameCard
+                to="/valorant"
+                label="VAL"
+                sub="Valorant"
+                img="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltc9289269ce32d529/66a2d987d606117d91d1777d/VAL_Console_Ep9_A0_Wide.jpg?auto=webp&disable=upscale&height=1055"
+                accent="#F43F5E"
+              />
+              <GameCard
+                to="/dota2"
+                label="DOTA"
+                sub="Dota 2"
+                img="https://cdn.akamai.steamstatic.com/apps/dota2/images/dota2_social.jpg"
+                accent="#38BDF8"
+              />
+            </motion.div>
+          </div>
+        </section>
 
-          <div className="flex items-end justify-between mb-10 pl-6">
+        {/* ── STATS ROW ──────────────────────────────────── */}
+        <motion.section {...FADE(0.2)} className="py-10 border-y border-white/[0.05] mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden">
+            <StatCell icon={<Mouse size={16} />} val="2 400+" label="Pro Profiles" />
+            <StatCell icon={<Crosshair size={16} />} val="150+" label="Teams Tracked" />
+            <StatCell icon={<Zap size={16} />} val="Daily" label="Data Updates" />
+            <StatCell icon={<ArrowUpRight size={16} />} val="100%" label="Verified Data" />
+          </div>
+        </motion.section>
+
+        {/* ── TICKER ─────────────────────────────────────── */}
+        <section className="mb-16 overflow-hidden relative">
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
+          <div className="flex gap-16 animate-scroll whitespace-nowrap items-center py-3">
+            {displayTeams.map((team, i) => (
+              <Link
+                key={`${team.id}-${i}`}
+                to={`/team/${team.id}`}
+                className="text-3xl font-black uppercase tracking-tighter text-white/[0.08] hover:text-white/60 transition-colors duration-300"
+              >
+                {team.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ── TRENDING ───────────────────────────────────── */}
+        <motion.section {...FADE(0.25)} className="pb-32">
+          <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white mb-2">
-                Trending <span className="text-yellow-400">Players</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 mb-2">Featured</p>
+              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">
+                Trending<br /><span className="text-primary">Players</span>
               </h2>
-              <p className="text-slate-400 text-sm font-medium uppercase tracking-widest">Most visited in last 24h</p>
             </div>
-            <Link to="/players" className="hidden md:flex text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-white transition-colors">
-              View All Leaderboards <ArrowRight size={14} className="ml-2"/>
+            <Link to="/cs2" className="hidden md:flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-600 hover:text-white transition-colors">
+              Browse All <ArrowRight size={12} />
             </Link>
           </div>
-          
-          {/* Тут використовуємо твій PlayerCard без змін */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-             {trendingPlayers.length > 0 ? (
-               trendingPlayers.map(player => (
-                 <Link key={player.id} to={`/player/${player.id}`} className="block h-[500px]">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {trendingPlayers.length > 0
+              ? trendingPlayers.map(player => (
+                  <Link key={player.id} to={`/player/${player.id}`} className="block h-[480px]">
                     <PlayerCard player={player} />
-                 </Link>
-               ))
-             ) : (
-               // Заглушки, поки дані вантажаться
-               [1, 2, 3].map(i => (
-                 <div key={i} className="h-[500px] bg-slate-900/50 rounded-[2rem] animate-pulse" />
-               ))
-             )}
+                  </Link>
+                ))
+              : [1, 2, 3].map(i => (
+                  <div key={i} className="h-[480px] bg-surface rounded-2xl animate-pulse border border-white/[0.04]" />
+                ))
+            }
           </div>
-        </div>
+        </motion.section>
 
       </div>
     </div>
@@ -208,35 +179,48 @@ export default function Home() {
 
 // --- SUB COMPONENTS ---
 
-// Bento Card - Чистий, без spotlight, тільки hover scale
-const BentoCard = ({ to, title, subtitle, bg, className }: any) => {
-  return (
-    <Link 
-      to={to} 
-      className={`group relative rounded-[2rem] overflow-hidden bg-slate-900 border border-white/5 hover:border-yellow-400/50 transition-all duration-500 ${className}`}
-    >
-      <img src={bg} alt={title} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/20 to-transparent opacity-90" />
-      
-      <div className="absolute bottom-0 left-0 p-8 w-full z-20">
-        <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-          <h3 className="text-5xl font-black italic uppercase text-white tracking-tighter">{title}</h3>
-          <p className="text-sm font-bold text-yellow-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">{subtitle}</p>
-        </div>
-      </div>
-      
-      {/* Стрілочка */}
-      <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 border border-white/20">
-         <ArrowRight size={18} className="text-white -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
-      </div>
-    </Link>
-  );
-};
+const GameCard = ({ to, label, sub, img, accent, className = '' }: {
+  to: string; label: string; sub: string; img: string; accent: string; className?: string;
+}) => (
+  <Link
+    to={to}
+    style={{ '--accent': accent } as any}
+    className={`group relative rounded-2xl overflow-hidden bg-surface border border-white/[0.06] hover:border-white/[0.14] transition-all duration-500 ${className}`}
+  >
+    <img
+      src={img}
+      alt={label}
+      className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
-const StatBox = ({ icon, val, label }: any) => (
-  <div className="p-8 rounded-3xl bg-slate-900/30 border border-white/5 flex flex-col items-center justify-center text-center hover:bg-slate-900/50 transition-colors backdrop-blur-sm">
-     <div className="text-slate-500 mb-4 p-3 bg-white/5 rounded-2xl">{icon}</div>
-     <div className="text-3xl font-black italic text-white mb-1">{val}</div>
-     <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{label}</div>
+    <div className="absolute bottom-0 left-0 p-6 z-10">
+      <h3
+        className="text-4xl font-black uppercase tracking-tighter text-white translate-y-1 group-hover:translate-y-0 transition-transform duration-300"
+        style={{ textShadow: `0 0 30px ${accent}40` }}
+      >
+        {label}
+      </h3>
+      <p
+        className="text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ color: accent }}
+      >
+        {sub}
+      </p>
+    </div>
+
+    <div className="absolute top-5 right-5 w-8 h-8 rounded-lg border border-white/[0.1] bg-white/[0.05] flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+      <ArrowUpRight size={14} className="text-white" />
+    </div>
+  </Link>
+);
+
+const StatCell = ({ icon, val, label }: { icon: React.ReactNode; val: string; label: string }) => (
+  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-6 bg-surface">
+    <div className="text-primary/60">{icon}</div>
+    <div>
+      <div className="text-2xl font-black text-white leading-none">{val}</div>
+      <div className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mt-0.5">{label}</div>
+    </div>
   </div>
 );
