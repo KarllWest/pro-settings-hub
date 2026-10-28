@@ -148,10 +148,10 @@ export default function Search() {
                   >
                     <div className="relative flex-shrink-0">
                       <img
-                        src={(item.type === 'team' ? item.logo_url : item.avatar_url) || 'https://www.hltv.org/img/static/player/player_9.png'}
+                        src={(item.type === 'team' ? item.logo_url : item.avatar_url) || '/player-placeholder.svg'}
                         className={`w-8 h-8 rounded-lg object-cover border border-white/[0.06] ${item.type === 'team' ? 'bg-background p-1' : ''}`}
                         alt=""
-                        onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+                        onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }}
                       />
                       <div className="absolute -bottom-1 -right-1 bg-surface rounded-md p-0.5 border border-white/[0.08]">
                         {item.type === 'team'

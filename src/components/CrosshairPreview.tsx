@@ -49,7 +49,7 @@ export default function CrosshairPreview({ code, size = 'md' }: CrosshairProps) 
           src="https://e0.pxfuel.com/wallpapers/151/874/desktop-wallpaper-cs-go-mirage-background-counter-strike-global-offensive.jpg" 
           className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-700"
           alt="Preview Map"
-          onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }} // Fallback if image fails
+          onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }} // Fallback if image fails
         />
         {/* Vignette effect */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />

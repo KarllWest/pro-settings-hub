@@ -36,10 +36,10 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent z-10" />
 
         <img
-          src={player.avatar_url || 'https://www.hltv.org/img/static/player/player_9.png'}
+          src={player.avatar_url || '/player-placeholder.svg'}
           alt={player.nickname}
           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-          onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+          onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }}
         />
 
         {/* Game badge */}

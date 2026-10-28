@@ -161,10 +161,10 @@ export default function AdminDashboard() {
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <img 
-                        src={player.avatar_url || 'https://www.hltv.org/img/static/player/player_9.png'} 
+                        src={player.avatar_url || '/player-placeholder.svg'} 
                         className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500 bg-slate-800" 
                         alt="" 
-                        onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+                        onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }}
                       />
                       <div>
                         <p className="font-black text-white group-hover:text-yellow-400 transition-colors uppercase italic text-base tracking-tight">{player.nickname}</p>

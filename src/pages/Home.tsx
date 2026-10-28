@@ -95,7 +95,7 @@ export default function Home() {
                 to="/cs2"
                 label="CS2"
                 sub="Counter-Strike 2"
-                img="https://blog.cs.money/wp-content/uploads/2023/08/cs2-inferno-banana-t-spawn.jpg"
+                img="/games/cs2.jpg"
                 accent="#FB923C"
                 className="col-span-2"
               />
@@ -103,14 +103,14 @@ export default function Home() {
                 to="/valorant"
                 label="VAL"
                 sub="Valorant"
-                img="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltc9289269ce32d529/66a2d987d606117d91d1777d/VAL_Console_Ep9_A0_Wide.jpg?auto=webp&disable=upscale&height=1055"
+                img="/games/valorant.svg"
                 accent="#F43F5E"
               />
               <GameCard
                 to="/dota2"
                 label="DOTA"
                 sub="Dota 2"
-                img="https://cdn.akamai.steamstatic.com/apps/dota2/images/dota2_social.jpg"
+                img="/games/dota2.jpg"
                 accent="#38BDF8"
               />
             </motion.div>

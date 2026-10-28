@@ -426,7 +426,7 @@ export default function Admin() {
            {filteredPlayers.map(p => (
              <div key={p.id} className="bg-white/[0.02] backdrop-blur-md p-6 rounded-[2.5rem] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] transition-all hover:-translate-y-1">
                 <div className="flex items-center gap-5">
-                   <img src={p.avatar_url || 'https://www.hltv.org/img/static/player/player_9.png'} className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500" alt="" onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }} />
+                   <img src={p.avatar_url || '/player-placeholder.svg'} className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-lg grayscale group-hover:grayscale-0 transition-all duration-500" alt="" onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }} />
                    <div>
                       <h4 className="font-black text-xl uppercase italic group-hover:text-yellow-400 transition-colors tracking-tight">{p.nickname}</h4>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{p.teams?.name || 'Free Agent'}</p>

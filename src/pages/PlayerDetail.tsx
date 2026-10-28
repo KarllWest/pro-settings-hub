@@ -148,7 +148,7 @@ export default function PlayerDetail() {
                 src={player.avatar_url}
                 className="w-56 h-56 md:w-72 md:h-72 object-cover object-top rounded-2xl shadow-2xl border border-white/[0.08] bg-surface"
                 alt={player.nickname}
-                onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+                onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }}
               />
             </div>
 
@@ -320,7 +320,7 @@ export default function PlayerDetail() {
                           src={tm.avatar_url}
                           alt={tm.nickname}
                           className="w-24 h-24 object-cover object-top rounded-xl mx-auto mb-4 bg-background border border-white/[0.07] group-hover:border-primary/30 transition-all"
-                          onError={(e) => { e.currentTarget.src = 'https://www.hltv.org/img/static/player/player_9.png'; }}
+                          onError={(e) => { e.currentTarget.src = '/player-placeholder.svg'; }}
                         />
                         <h4 className="text-lg font-black uppercase text-white group-hover:text-primary transition tracking-tight">{tm.nickname}</h4>
                         <p className="text-[10px] text-slate-600 uppercase font-bold tracking-widest mt-1">{tm.real_name}</p>
